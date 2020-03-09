@@ -161,7 +161,8 @@ export class PoolLayout extends go.GridLayout {
   encapsulation: ViewEncapsulation.None
 })
 export class SwimLaneComponent implements OnInit {
-
+  message:String
+  demo = false
   constructor() { }
 
   // initialize diagram / templates
@@ -401,17 +402,6 @@ export class SwimLaneComponent implements OnInit {
         e.subject.each(val=>{
           if (!(val instanceof go.Link)) console.log("Dropped in "+ val.key);
         })
-        //console.log(data)
-        // diagram.model.commit(function(m) {  // this Model
-
-        //   // This is the safe way to change model data
-        //   // GoJS will be notified that the data has changed
-        //   // and can update the node in the Diagram
-        //   // and record the change in the UndoManager
-        //   m.set(data, "key", "red");
-      
-        // }, "change color");
-        //
       });
 
       diagram.addDiagramListener("TextEdited",
@@ -476,6 +466,59 @@ export class SwimLaneComponent implements OnInit {
     this.diagramNodeData = DataSyncService.syncNodeData(changes, this.diagramNodeData);
     this.diagramLinkData = DataSyncService.syncLinkData(changes, this.diagramLinkData);
   };
+
+  doHello(){
+    // console.log("Hello")
+    // var node = diagram.findNodeForKey("oneA");
+    // console.log(node)
+    // diagram.model.commit(function(m){
+    //   m.set(node.data,"group","Lane3")
+    //   relayoutDiagram()
+    // },"changed group")
+    this.diagramNodeData.push({ key: "Pool3", text: "Pool3", isGroup: true, category: "Pool" },
+    { key: "Lane7", text: "Lane7", isGroup: true, group: "Pool3",color: "lightyellow" },
+    { key: "sevenA", text: "sevenA",group: "Lane7"},
+    { key: "threeA", text: "threeA",group: "Lane3"});
+    this.diagramNodeData[6].key = "1A"
+    this.diagramLinkData[0].from = "1A"
+    this.diagramLinkData[1].from = "1A"
+    relayoutLanes()
+    setTimeout(()=>{
+      relayoutLanes()
+    })
+  }
+
+  doGroup(){
+    this.demo = true
+    this.message = "Added Lane7 to pre-existing Pool2 and added Pool3 with Lane8"
+    this.diagramNodeData.push({ key: "Pool3", text: "Pool3", isGroup: true, category: "Pool" },
+    { key: "Lane7", text: "Lane7", isGroup: true, group: "Pool2",color: "lightblue" },
+    { key: "Lane8", text: "Lane8", isGroup: true, group: "Pool3",color: "lightyellow" })
+    relayoutDiagram()
+  }
+
+  doNode(){
+    this.demo = true
+    this.message = "Added node threeA to Lane3"
+    this.diagramNodeData.push({ key: "threeA", text: "threeA",group: "Lane3"})
+    relayoutLanes()
+    setTimeout(()=>{
+      relayoutLanes()
+    })
+  }
+  
+  doModify(){
+    this.demo = true
+    this.message = "Modified oneA of Lane1 to be 1A"
+    this.diagramNodeData[6].key = "1A"
+    this.diagramNodeData[6].text = "1A"
+    this.diagramLinkData[0].from = "1A"
+    this.diagramLinkData[1].from = "1A"
+    relayoutLanes()
+    setTimeout(()=>{
+      relayoutLanes()
+    })
+  }
 
   ngOnInit(): void {
   }
