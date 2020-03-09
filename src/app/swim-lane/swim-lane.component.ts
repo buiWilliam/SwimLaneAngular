@@ -405,7 +405,7 @@ export class SwimLaneComponent implements OnInit {
       });
 
       diagram.addDiagramListener("TextEdited",
-      function(e) {
+      (e)=> {
         if (!(e instanceof go.Link)) console.log("Change to " + e.subject.part.data.key);
       });
 
@@ -413,7 +413,7 @@ export class SwimLaneComponent implements OnInit {
     return diagram;
   }
 
-  public diagramNodeData: go.ObjectData[] =
+  public diagramNodeData: Array<go.ObjectData> =
     [ // node data
       { key: "Pool1", text: "Pool", isGroup: true, category: "Pool" },
       { key: "Pool2", text: "Pool2", isGroup: true, category: "Pool" },
@@ -441,7 +441,7 @@ export class SwimLaneComponent implements OnInit {
       { key: "fiveA", text: "fiveA",group: "Lane5" },
       { key: "sixA", text: "sixA",group: "Lane6" }
     ]
-  public diagramLinkData: go.ObjectData[] =
+  public diagramLinkData: Array<go.ObjectData> =
     [ // link data
       { from: "oneA", to: "oneB" },
       { from: "oneA", to: "oneC" },
@@ -466,27 +466,6 @@ export class SwimLaneComponent implements OnInit {
     this.diagramNodeData = DataSyncService.syncNodeData(changes, this.diagramNodeData);
     this.diagramLinkData = DataSyncService.syncLinkData(changes, this.diagramLinkData);
   };
-
-  doHello(){
-    // console.log("Hello")
-    // var node = diagram.findNodeForKey("oneA");
-    // console.log(node)
-    // diagram.model.commit(function(m){
-    //   m.set(node.data,"group","Lane3")
-    //   relayoutDiagram()
-    // },"changed group")
-    this.diagramNodeData.push({ key: "Pool3", text: "Pool3", isGroup: true, category: "Pool" },
-    { key: "Lane7", text: "Lane7", isGroup: true, group: "Pool3",color: "lightyellow" },
-    { key: "sevenA", text: "sevenA",group: "Lane7"},
-    { key: "threeA", text: "threeA",group: "Lane3"});
-    this.diagramNodeData[6].key = "1A"
-    this.diagramLinkData[0].from = "1A"
-    this.diagramLinkData[1].from = "1A"
-    relayoutLanes()
-    setTimeout(()=>{
-      relayoutLanes()
-    })
-  }
 
   doGroup(){
     this.demo = true

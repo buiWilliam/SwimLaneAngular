@@ -1,8 +1,8 @@
 <div class="container">
   <div class="alert alert-info" role="alert" *ngIf="demo">{{message}}</div>
+  <button class="btn-success" (click)="doModify()">Modify Existing</button>
   <button class="btn-primary" (click)="doGroup()">Add Group</button>
   <button class="btn-secondary" (click)="doNode()">Add Node</button>
-  <button class="btn-success" (click)="doModify()">Modify Existing</button>
   
   <gojs-diagram [initDiagram]='initDiagram' [nodeDataArray]='diagramNodeData' [linkDataArray]='diagramLinkData'
     [divClassName]='diagramDivClassName' (modelChange)='diagramModelChange($event)'>
