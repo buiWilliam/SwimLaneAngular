@@ -25,10 +25,10 @@ export class PaletteComponent implements OnInit {
           $(go.Shape, 'RoundedRectangle',
             {
               stroke: null,
-              fill:"yellow"
+              fill:"royalblue"
             },
           ),
-          $(go.TextBlock, { margin: 5, editable: true, isMultiline:false,name: "TEXT"},
+          $(go.TextBlock, { stroke:"white", margin: 5, editable: true, isMultiline:false},
             new go.Binding('text', 'key').makeTwoWay())
         );
   

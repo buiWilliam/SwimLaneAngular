@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import * as go from 'gojs';
 import { DataSyncService } from 'gojs-angular';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 const $ = go.GraphObject.make
 
@@ -161,9 +162,11 @@ export class PoolLayout extends go.GridLayout {
   encapsulation: ViewEncapsulation.None
 })
 export class SwimLaneComponent implements OnInit {
-  message:String
+  message: string
   demo = false
-  constructor() { }
+  group: string
+  constructor(private _snackBar: MatSnackBar) { 
+  }
 
   // initialize diagram / templates
   public initDiagram(): go.Diagram {
@@ -229,7 +232,7 @@ export class SwimLaneComponent implements OnInit {
         handlesDragDropForMembers: true,  // don't need to define handlers on member Nodes and Links
         mouseDrop:
           function (e, grp: go.Group) {  // dropping a copy of some Nodes and Links onto this Group adds them to this Group
-            //if (!e.shift) return;  // cannot change groups with an unmodified drag-and-drop
+            if (!e.shift) return;  // cannot change groups with an unmodified drag-and-drop
             // don't allow drag-and-dropping a mix of regular Nodes and Groups
             if (!e.diagram.selection.any(function (n) { return n instanceof go.Group; })) {
               var ok = grp.addMembers(grp.diagram.selection, true);
@@ -487,6 +490,7 @@ export class SwimLaneComponent implements OnInit {
   doGroup(){
     this.demo = true
     this.message = "Added Lane7 to pre-existing Pool2 and added Pool3 with Lane8"
+    //this.openSnackBar()
     this.diagramNodeData.push({ key: "Pool3", text: "Pool3", isGroup: true, category: "Pool" },
     { key: "Lane7", text: "Lane7", isGroup: true, group: "Pool2",color: "lightblue" },
     { key: "Lane8", text: "Lane8", isGroup: true, group: "Pool3",color: "lightyellow" })
@@ -496,6 +500,7 @@ export class SwimLaneComponent implements OnInit {
   doNode(){
     this.demo = true
     this.message = "Added node threeA to Lane3"
+    //this.openSnackBar()
     this.diagramNodeData.push({ key: "threeA", text: "threeA",group: "Lane3"})
     relayoutLanes()
     setTimeout(()=>{
@@ -506,15 +511,22 @@ export class SwimLaneComponent implements OnInit {
   doModify(){
     this.demo = true
     this.message = "Modified oneA of Lane1 to be 1A"
+    //this.openSnackBar()
+    console.log(this)
     this.diagramNodeData[6].key = "1A"
     this.diagramNodeData[6].text = "1A"
     this.diagramLinkData[0].from = "1A"
     this.diagramLinkData[1].from = "1A"
+    console.log(this)
     relayoutLanes()
     setTimeout(()=>{
       relayoutLanes()
     })
   }
+
+  // openSnackBar(){
+  //   this._snackBar.open(this.message,null,{horizontalPosition: "center",verticalPosition: "bottom"})
+  // }
 
   ngOnInit(): void {
   }

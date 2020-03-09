@@ -1,15 +1,16 @@
-<div class="container">
-  <div class="alert alert-info" role="alert" *ngIf="demo">{{message}}</div>
-  <button class="btn-success" (click)="doModify()">Modify Existing</button>
-  <button class="btn-primary" (click)="doGroup()">Add Group</button>
-  <button class="btn-secondary" (click)="doNode()">Add Node</button>
-  
+<div style="width: 100%; text-align: center;">
   <gojs-diagram [initDiagram]='initDiagram' [nodeDataArray]='diagramNodeData' [linkDataArray]='diagramLinkData'
     [divClassName]='diagramDivClassName' (modelChange)='diagramModelChange($event)'>
   </gojs-diagram>
-  <div class="container">
+  <div >
     <p>Hold Shift to move nodes into a lane</p>
-    <p>{{diagramNodeData|json}}</p>
-    <!-- <p>{{diagramLinkData|json}}</p> -->
+    <p *ngIf="demo">{{message}}</p>
+    <button mat-stroked-button (click)="doModify()">Modify Existing</button>
+    <button mat-stroked-button (click)="doGroup()">Add Group</button>
+    <button mat-stroked-button (click)="doNode()">Add Node</button>
   </div>
+  <!-- <div>
+    <p>{{diagramNodeData|json}}</p>
+    <p>{{diagramLinkData|json}}</p>
+  </div> -->
 </div>
