@@ -406,7 +406,24 @@ export class SwimLaneComponent implements OnInit {
 
       diagram.addDiagramListener("TextEdited",
       (e)=> {
-        if (!(e instanceof go.Link)) console.log("Change to " + e.subject.part.data.key);
+        if (!(e instanceof go.Link)) console.log("Change " + e.subject.part.data.key+" to "+e.subject.text);
+        console.log(this)
+        var node = this.nodeDataArray.find(element=>element.key==e.subject.part.key)
+        console.log(node)
+        node.key=e.subject.text
+        node.text=e.subject.text
+        var links = this.linkDataArray.filter(element=>element.from==e.subject.part.key||element.to==e.subject.part.key)
+        console.log(links)
+        for (let link of links){
+          if (link.from == e.subject.part.key)
+            link.from = e.subject.text
+          if (link.to == e.subject.part.key)
+            link.to = e.subject.text
+        }
+        relayoutLanes()
+        setTimeout(()=>{
+          relayoutLanes()
+        })
       });
 
     relayoutLanes()
