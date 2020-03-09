@@ -165,6 +165,7 @@ export class SwimLaneComponent implements OnInit {
   message: string
   demo = false
   group: string
+  showArrays = false
   constructor(private _snackBar: MatSnackBar) { 
   }
 
@@ -524,9 +525,9 @@ export class SwimLaneComponent implements OnInit {
     })
   }
 
-  // openSnackBar(){
-  //   this._snackBar.open(this.message,null,{horizontalPosition: "center",verticalPosition: "bottom"})
-  // }
+  doShow(){
+    this.showArrays=true
+  }
 
   ngOnInit(): void {
   }
