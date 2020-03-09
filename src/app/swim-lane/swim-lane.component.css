@@ -1,0 +1,7 @@
+/* app.component.css */
+.myDiagramDiv {
+    background: whitesmoke;
+    width: 1280px;
+    height: 700px;
+    border: 1px solid black;
+  }
