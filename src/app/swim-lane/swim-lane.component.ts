@@ -1,7 +1,8 @@
-import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, ViewEncapsulation, ViewChild, ContentChild } from '@angular/core';
 import * as go from 'gojs';
 import { DataSyncService } from 'gojs-angular';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { element } from 'protractor';
 
 const $ = go.GraphObject.make
 
@@ -159,20 +160,32 @@ export class PoolLayout extends go.GridLayout {
   selector: 'app-swim-lane',
   templateUrl: './swim-lane.component.html',
   styleUrls: ['./swim-lane.component.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.ShadowDom
 })
 export class SwimLaneComponent implements OnInit {
   message: string
   demo = false
-  group: string
+  pools: Array<go.ObjectData>
   showArrays = false
-  constructor(private _snackBar: MatSnackBar) { 
+  selectedGroup: string
+  poolName = "Pool3"
+  laneName = "Lane7"
+  selectedPool = "Pool2"
+  selectedNode: go.ObjectData
+  nodes: Array<go.ObjectData>
+  lanes: Array<go.ObjectData>
+  selectedLane = "Lane3"
+  nodeName = "threeA"
+  renameNode = "1A"
+  selectedColor = "lightblue"
+  @ViewChild('myDiagram') myDiagram
+  @ViewChild('addButton') addButton
+  constructor(private _snackBar: MatSnackBar) {
   }
 
   // initialize diagram / templates
   public initDiagram(): go.Diagram {
     const $ = go.GraphObject.make;
-
     diagram = $(go.Diagram,
       {
         // use a custom ResizingTool (along with a custom ResizeAdornment on each Group)
@@ -200,7 +213,7 @@ export class SwimLaneComponent implements OnInit {
         "animationManager.isEnabled": false,
         "undoManager.isEnabled": true, //must be allow for model change listening
         'undoManager.maxHistoryLength': 0, // to disable undo & redo
-        model:$(go.GraphLinksModel,
+        model: $(go.GraphLinksModel,
           {
             linkKeyProperty: 'key'
           })
@@ -343,12 +356,12 @@ export class SwimLaneComponent implements OnInit {
       ));
 
     diagram.linkTemplate =
-    $(go.Link,
-      { routing: go.Link.AvoidsNodes, corner: 5 },
-      { relinkableFrom: true, relinkableTo: true },
-      $(go.Shape),
-      $(go.Shape, { toArrow: "Standard" })
-    );
+      $(go.Link,
+        { routing: go.Link.AvoidsNodes, corner: 5 },
+        { relinkableFrom: true, relinkableTo: true },
+        $(go.Shape),
+        $(go.Shape, { toArrow: "Standard" })
+      );
 
     function stayInGroup(part, pt, gridpt) {
       // don't constrain top-level nodes
@@ -396,73 +409,80 @@ export class SwimLaneComponent implements OnInit {
     }
 
     diagram.addDiagramListener("ObjectSingleClicked",
-      function(e) {
+      function (e) {
         var data = e.subject.part.data
-        if (!(data instanceof go.Link)) console.log("Clicked on "+ data.key);
+        if (!(data instanceof go.Link)) console.log("Clicked on " + data.key);
       });
 
-      diagram.addDiagramListener("ExternalObjectsDropped",
-      function(e) {
-        e.subject.each(val=>{
-          if (!(val instanceof go.Link)) console.log("Dropped in "+ val.key);
+    diagram.addDiagramListener("ObjectContextClicked",
+      function (e) {
+        var data = e.subject.part.data
+        if (!(data instanceof go.Link)) console.log("Right Clicked on " + data.key);
+      });
+
+    diagram.addDiagramListener("ExternalObjectsDropped",
+      function (e) {
+        e.subject.each(val => {
+          if (!(val instanceof go.Link)) console.log("Dropped in " + val.key);
         })
       });
 
-      diagram.addDiagramListener("TextEdited",
-      (e)=> {
-        if (!(e instanceof go.Link)) console.log("Change " + e.subject.part.data.key+" to "+e.subject.text);
+    diagram.addDiagramListener("TextEdited",
+      (e) => {
+        if (!(e instanceof go.Link)) console.log("Change " + e.subject.part.data.key + " to " + e.subject.text);
         console.log(this)
-        var node = this.nodeDataArray.find(element=>element.key==e.subject.part.key)
+        var node = this.nodeDataArray.find(element => element.key == e.subject.part.key)
         console.log(node)
-        node.key=e.subject.text
-        node.text=e.subject.text
-        var links = this.linkDataArray.filter(element=>element.from==e.subject.part.key||element.to==e.subject.part.key)
+        node.key = e.subject.text
+        node.text = e.subject.text
+        var links = this.linkDataArray.filter(element => element.from == e.subject.part.key || element.to == e.subject.part.key)
         console.log(links)
-        for (let link of links){
+        for (let link of links) {
           if (link.from == e.subject.part.key)
             link.from = e.subject.text
           if (link.to == e.subject.part.key)
             link.to = e.subject.text
         }
         relayoutLanes()
-        setTimeout(()=>{
+        setTimeout(() => {
           relayoutLanes()
         })
+        relayoutDiagram()
       });
 
     relayoutLanes()
     return diagram;
   }
 
-  public diagramNodeData: Array<go.ObjectData> =
+  public nodeDataArray: Array<go.ObjectData> =
     [ // node data
       { key: "Pool1", text: "Pool", isGroup: true, category: "Pool" },
       { key: "Pool2", text: "Pool2", isGroup: true, category: "Pool" },
-      { key: "Lane1", text: "Lane1", isGroup: true, group: "Pool1",color:"lightblue" },
-      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1",color: "lightgreen" },
-      { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1",color: "lightyellow" },
-      { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1",color: "orange" },
+      { key: "Lane1", text: "Lane1", isGroup: true, group: "Pool1", color: "lightblue" },
+      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: "lightgreen" },
+      { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1", color: "lightyellow" },
+      { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1", color: "orange" },
       { key: "oneA", text: "oneA", group: "Lane1" },
-      { key: "oneB", text: "oneB",group: "Lane1" },
-      { key: "oneC", text: "oneC",group: "Lane1" },
-      { key: "oneD", text: "oneD",group: "Lane1" },
-      { key: "twoA", text: "twoA",group: "Lane2" },
-      { key: "twoB", text: "twoB",group: "Lane2" },
-      { key: "twoC", text: "twoC",group: "Lane2" },
-      { key: "twoD", text: "twoD",group: "Lane2" },
-      { key: "twoE", text: "twoE",group: "Lane2" },
-      { key: "twoF", text: "twoF",group: "Lane2" },
-      { key: "twoG", text: "twoG",group: "Lane2" },
-      { key: "fourA", text: "fourA",group: "Lane4" },
-      { key: "fourB", text: "fourB",group: "Lane4" },
-      { key: "fourC", text: "fourC",group: "Lane4" },
-      { key: "fourD", text: "fourD",group: "Lane4" },
-      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2",color: "lightyellow" },
-      { key: "Lane6", text: "Lane6", isGroup: true, group: "Pool2",color: "lightgreen" },
-      { key: "fiveA", text: "fiveA",group: "Lane5" },
-      { key: "sixA", text: "sixA",group: "Lane6" }
+      { key: "oneB", text: "oneB", group: "Lane1" },
+      { key: "oneC", text: "oneC", group: "Lane1" },
+      { key: "oneD", text: "oneD", group: "Lane1" },
+      { key: "twoA", text: "twoA", group: "Lane2" },
+      { key: "twoB", text: "twoB", group: "Lane2" },
+      { key: "twoC", text: "twoC", group: "Lane2" },
+      { key: "twoD", text: "twoD", group: "Lane2" },
+      { key: "twoE", text: "twoE", group: "Lane2" },
+      { key: "twoF", text: "twoF", group: "Lane2" },
+      { key: "twoG", text: "twoG", group: "Lane2" },
+      { key: "fourA", text: "fourA", group: "Lane4" },
+      { key: "fourB", text: "fourB", group: "Lane4" },
+      { key: "fourC", text: "fourC", group: "Lane4" },
+      { key: "fourD", text: "fourD", group: "Lane4" },
+      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2", color: "lightyellow" },
+      { key: "Lane6", text: "Lane6", isGroup: true, group: "Pool2", color: "lightgreen" },
+      { key: "fiveA", text: "fiveA", group: "Lane5" },
+      { key: "sixA", text: "sixA", group: "Lane6" }
     ]
-  public diagramLinkData: Array<go.ObjectData> =
+  public linkDataArray: Array<go.ObjectData> =
     [ // link data
       { from: "oneA", to: "oneB" },
       { from: "oneA", to: "oneC" },
@@ -484,51 +504,91 @@ export class SwimLaneComponent implements OnInit {
 
   // When the diagram model changes, update app data to reflect those changes
   public diagramModelChange = function (changes: go.IncrementalData) {
-    this.diagramNodeData = DataSyncService.syncNodeData(changes, this.diagramNodeData);
-    this.diagramLinkData = DataSyncService.syncLinkData(changes, this.diagramLinkData);
+    this.nodeDataArray = DataSyncService.syncNodeData(changes, this.nodeDataArray);
+    this.linkDataArray = DataSyncService.syncLinkData(changes, this.linkDataArray);
   };
 
-  doGroup(){
+  doAdd() {
     this.demo = true
-    this.message = "Added Lane7 to pre-existing Pool2 and added Pool3 with Lane8"
-    //this.openSnackBar()
-    this.diagramNodeData.push({ key: "Pool3", text: "Pool3", isGroup: true, category: "Pool" },
-    { key: "Lane7", text: "Lane7", isGroup: true, group: "Pool2",color: "lightblue" },
-    { key: "Lane8", text: "Lane8", isGroup: true, group: "Pool3",color: "lightyellow" })
+    console.log(this.selectedGroup)
+    if (this.selectedGroup == "Pool") {
+      this.nodeDataArray.push({ key: this.poolName, text: this.poolName, isGroup: true, category: "Pool" })
+      this.pools = this.nodeDataArray.filter(element => element.category == 'Pool')
+      this.message = "Added "+this.poolName
+      this.openSnackBar()
+    }
+    else if (this.selectedGroup == "Lane") {
+      this.nodeDataArray.push({ key: this.laneName, text: this.laneName, isGroup: true, group: this.selectedPool, color: this.selectedColor })
+      this.lanes = this.nodeDataArray.filter(element => element.category != 'Pool' && element.isGroup == true)
+      this.message = "Added "+this.laneName+" to "+this.selectedPool
+      this.openSnackBar()
+    }
+    else if (this.selectedGroup == "Node") {
+      this.nodeDataArray.push({ key: this.nodeName, text: this.nodeName, group: this.selectedLane })
+      this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
+      this.message = "Added "+this.nodeName+" to "+this.selectedLane
+      this.openSnackBar()
+      relayoutLanes()
+      setTimeout(() => {
+        relayoutLanes()
+      })
+    }
     relayoutDiagram()
   }
 
-  doNode(){
+  doModify() {
     this.demo = true
-    this.message = "Added node threeA to Lane3"
-    //this.openSnackBar()
-    this.diagramNodeData.push({ key: "threeA", text: "threeA",group: "Lane3"})
+    this.message = "Modified " + this.selectedNode.key + " of " + this.selectedNode.group + " to " + this.renameNode
+    this.openSnackBar()
+    console.log(this.selectedNode.key)
+    var node = this.nodeDataArray.find(element => element.key == this.selectedNode.key)
+    var oldNode = node.key
+    node.key = this.renameNode
+    node.text = this.renameNode
+    var links = this.linkDataArray.filter(element => (element.from == "oneA" || element.to == "oneA"))
+    console.log(links)
+    console.log(this.selectedNode.key.length)
+    links = this.linkDataArray.filter(element => (element.from == oldNode || element.to == oldNode))
+    console.log(links)
+    for (let link of links) {
+      if (link.from == oldNode)
+        link.from = this.renameNode
+      if (link.to == oldNode)
+        link.to = this.renameNode
+    }
     relayoutLanes()
-    setTimeout(()=>{
+    setTimeout(() => {
       relayoutLanes()
     })
-  }
-  
-  doModify(){
-    this.demo = true
-    this.message = "Modified oneA of Lane1 to be 1A"
-    //this.openSnackBar()
-    console.log(this)
-    this.diagramNodeData[6].key = "1A"
-    this.diagramNodeData[6].text = "1A"
-    this.diagramLinkData[0].from = "1A"
-    this.diagramLinkData[1].from = "1A"
-    console.log(this)
-    relayoutLanes()
-    setTimeout(()=>{
-      relayoutLanes()
-    })
+    relayoutDiagram()
+    this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
   }
 
-  doShow(){
-    this.showArrays=true
+  doShow() {
+    if(this.showArrays==false)
+      this.showArrays = true
+    else
+      this.showArrays = false
+  }
+
+  openSnackBar() {
+    this._snackBar.open(this.message, "x",{duration:2000})
+  }
+
+  onKeyupPool(event){
+    console.log(this.pools)
+    console.log(event.target.value)
+    console.log(this.addButton)
+    console.log(this.pools.filter(element=>element.key==event.target.value))
+    this.addButton.disable = this.pools.filter(element=>element.key==event.target.value).length > 0
   }
 
   ngOnInit(): void {
+    this.pools = this.nodeDataArray.filter(element => element.category == 'Pool')
+    this.lanes = this.nodeDataArray.filter(element => element.category != 'Pool' && element.isGroup == true)
+    this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
+    this.selectedNode = this.nodes[0]
+    console.log(this.pools)
+    console.log(this.nodes)
   }
 }

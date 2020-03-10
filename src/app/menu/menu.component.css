@@ -1,4 +1,6 @@
 div{
+    margin: 0;
+    top:0;
     width: 100%;
     background-color: gray;
     text-shadow:

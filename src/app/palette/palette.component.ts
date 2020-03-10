@@ -22,10 +22,9 @@ export class PaletteComponent implements OnInit {
       // define the Node template
       palette.nodeTemplate =
         $(go.Node, 'Auto',
-          $(go.Shape, 'RoundedRectangle',
+          $(go.Shape, new go.Binding('figure','key'), new go.Binding('fill','color'),
             {
               stroke: null,
-              fill:"royalblue"
             },
           ),
           $(go.TextBlock, { stroke:"white", margin: 5, editable: true, isMultiline:false},
@@ -39,7 +38,9 @@ export class PaletteComponent implements OnInit {
       return palette;
     }
     public paletteNodeData: go.ObjectData[] = [
-      { key: "Node"}
+      { key: "Rectangle",color:"red"},
+      {key:"Triangle",color:"green"},
+      {key:"Circle",color:"blue"}
     ];
     public paletteLinkData: go.ObjectData[] = [
       

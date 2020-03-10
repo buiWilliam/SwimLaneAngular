@@ -1,17 +1,73 @@
-<div style="width: 100%; text-align: center;">
-  <gojs-diagram [initDiagram]='initDiagram' [nodeDataArray]='diagramNodeData' [linkDataArray]='diagramLinkData'
+<div style="text-align: center;">
+  <gojs-diagram #myDiagram [initDiagram]='initDiagram' [nodeDataArray]='nodeDataArray' [linkDataArray]='linkDataArray'
     [divClassName]='diagramDivClassName' (modelChange)='diagramModelChange($event)'>
   </gojs-diagram>
-  <div >
+  <div>
     <p>Hold Shift to move nodes into a lane</p>
-    <p *ngIf="demo">{{message}}</p>
-    <button mat-stroked-button (click)="doModify()">Modify Existing</button>
-    <button mat-stroked-button (click)="doGroup()">Add Group</button>
-    <button mat-stroked-button (click)="doNode()">Add Node</button>
-    <button mat-stroked-button (click)="doShow()">Show Arrays</button>
   </div>
-  <div *ngIf="showArrays">
-    <p>{{diagramNodeData|json}}</p>
-    <p>{{diagramLinkData|json}}</p>
+  <div style="width: 75%; margin: auto;">
+  <div style="width:25%; float: left;">
+    Change
+    <mat-select style="width: 25%; border: 1px solid black;" [(value)]="selectedNode">
+      <mat-option *ngFor="let node of nodes" [value]="node">{{node.key}}</mat-option>
+    </mat-select>
+    <span> to <input style="width:25%;border: 1px solid black;"[(ngModel)]="renameNode" placeholder="Change to..."></span>
+    <br>
+    <br>
+    <button mat-stroked-button (click)="doModify()">Modify Existing</button>
+  </div>
+  <div style="width:50%; float: left;">
+    <mat-radio-group [(ngModel)]=selectedGroup>
+      <mat-radio-button value="Pool">Pool</mat-radio-button>
+      <mat-radio-button value="Lane">Lane</mat-radio-button>
+      <mat-radio-button value="Node">Node</mat-radio-button>
+    </mat-radio-group>
+    <br>
+    <span *ngIf="selectedGroup!=undefined">Creating new {{selectedGroup}} </span>
+    <br>
+    <span *ngIf="selectedGroup=='Pool'"><input (keyup)="onKeyupPool($event)" style="border: 1px solid black;"[(ngModel)]="poolName" placeholder="Enter Pool Name"><br></span>
+    <span *ngIf="selectedGroup=='Lane'">
+        <span style="width:33%;float: left;">
+          <mat-label>Enter Lane Name</mat-label>
+          <input style="width: 100%;border: 1px solid black;"[(ngModel)]="laneName" placeholder="Enter Lane Name">
+        </span>
+        <span style="width:33%;float: left;">
+        <mat-label>Select a pool</mat-label>
+        <mat-select style="border: 1px solid black;"[(value)]="selectedPool">
+          <mat-option *ngFor="let node of pools" [value]="node.key">{{node.key}}</mat-option>
+        </mat-select>
+        </span>
+        <span style="width:33%;float: left;">
+        <mat-label>Select a color</mat-label>
+        <br>
+        <input style="width:100%"[(ngModel)]="selectedColor" type="color">
+        </span>
+        <br>
+        <p *ngIf="laneName!=''">Adding {{laneName}} to {{selectedPool}}</p>
+    </span>
+    <span *ngIf="selectedGroup=='Node'">
+      <span style="width: 50%; float: left;">
+        <mat-label>Enter Node Name</mat-label>
+        <input style="width: 100%;border: 1px solid black;" [(ngModel)]="nodeName" placeholder="Enter Node Name">
+      </span>
+      <span style="width: 50%; float: left;">
+        <mat-label>Select a Lane</mat-label>
+        <mat-select style="border: 1px solid black;"[(value)]="selectedLane">
+          <mat-option *ngFor="let node of lanes" [value]="node.key">{{node.key}}</mat-option>
+        </mat-select>
+      </span>
+      <br>
+      <p *ngIf="nodeName!=''">Adding {{nodeName}} to {{selectedLane}}</p></span>
+    <button #addButton mat-stroked-button (click)="doAdd()">Add</button>
+  </div>
+  <div style="width:25%; float: left;">
+    <button mat-stroked-button *ngIf="!showArrays" (click)="doShow()">Show Arrays</button>
+    <button mat-stroked-button *ngIf="showArrays" (click)="doShow()">Hide Arrays</button>
+  </div>
+</div>
+<br>
+  <div *ngIf="showArrays" style="width: 100%; float: left">
+    <p>{{nodeDataArray|json}}</p>
+    <p>{{linkDataArray|json}}</p>
   </div>
 </div>
