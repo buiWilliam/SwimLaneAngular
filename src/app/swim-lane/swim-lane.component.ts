@@ -429,25 +429,31 @@ export class SwimLaneComponent implements OnInit {
 
     diagram.addDiagramListener("TextEdited",
       (e) => {
-        if (!(e instanceof go.Link)) console.log("Change " + e.subject.part.data.key + " to " + e.subject.text);
-        console.log(this)
-        var node = this.nodeDataArray.find(element => element.key == e.subject.part.key)
-        console.log(node)
-        node.key = e.subject.text
-        node.text = e.subject.text
-        var links = this.linkDataArray.filter(element => element.from == e.subject.part.key || element.to == e.subject.part.key)
-        console.log(links)
-        for (let link of links) {
-          if (link.from == e.subject.part.key)
-            link.from = e.subject.text
-          if (link.to == e.subject.part.key)
-            link.to = e.subject.text
+        if (this.nodeDataArray.filter(element => element.key == e.subject.text).length > 0) {
+          e.subject.text = e.subject.part.data.key
+          if (!(e instanceof go.Link)) console.log("Conflicting names");
         }
-        relayoutLanes()
-        setTimeout(() => {
+        else {
+          if (!(e instanceof go.Link)) console.log("Change " + e.subject.part.data.key + " to " + e.subject.text);
+          console.log(this)
+          var node = this.nodeDataArray.find(element => element.key == e.subject.part.key)
+          console.log(node)
+          node.key = e.subject.text
+          node.text = e.subject.text
+          var links = this.linkDataArray.filter(element => element.from == e.subject.part.key || element.to == e.subject.part.key)
+          console.log(links)
+          for (let link of links) {
+            if (link.from == e.subject.part.key)
+              link.from = e.subject.text
+            if (link.to == e.subject.part.key)
+              link.to = e.subject.text
+          }
           relayoutLanes()
-        })
-        relayoutDiagram()
+          setTimeout(() => {
+            relayoutLanes()
+          })
+          relayoutDiagram()
+        }
       });
 
     relayoutLanes()
@@ -514,19 +520,19 @@ export class SwimLaneComponent implements OnInit {
     if (this.selectedGroup == "Pool") {
       this.nodeDataArray.push({ key: this.poolName, text: this.poolName, isGroup: true, category: "Pool" })
       this.pools = this.nodeDataArray.filter(element => element.category == 'Pool')
-      this.message = "Added "+this.poolName
+      this.message = "Added " + this.poolName
       this.openSnackBar()
     }
     else if (this.selectedGroup == "Lane") {
       this.nodeDataArray.push({ key: this.laneName, text: this.laneName, isGroup: true, group: this.selectedPool, color: this.selectedColor })
       this.lanes = this.nodeDataArray.filter(element => element.category != 'Pool' && element.isGroup == true)
-      this.message = "Added "+this.laneName+" to "+this.selectedPool
+      this.message = "Added " + this.laneName + " to " + this.selectedPool
       this.openSnackBar()
     }
     else if (this.selectedGroup == "Node") {
       this.nodeDataArray.push({ key: this.nodeName, text: this.nodeName, group: this.selectedLane })
       this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
-      this.message = "Added "+this.nodeName+" to "+this.selectedLane
+      this.message = "Added " + this.nodeName + " to " + this.selectedLane
       this.openSnackBar()
       relayoutLanes()
       setTimeout(() => {
@@ -538,45 +544,51 @@ export class SwimLaneComponent implements OnInit {
 
   doModify() {
     this.demo = true
-    this.message = "Modified " + this.selectedNode.key + " of " + this.selectedNode.group + " to " + this.renameNode
-    this.openSnackBar()
-    console.log(this.selectedNode.key)
-    var node = this.nodeDataArray.find(element => element.key == this.selectedNode.key)
-    var oldNode = node.key
-    node.key = this.renameNode
-    node.text = this.renameNode
-    var links = this.linkDataArray.filter(element => (element.from == "oneA" || element.to == "oneA"))
-    console.log(links)
-    console.log(this.selectedNode.key.length)
-    links = this.linkDataArray.filter(element => (element.from == oldNode || element.to == oldNode))
-    console.log(links)
-    for (let link of links) {
-      if (link.from == oldNode)
-        link.from = this.renameNode
-      if (link.to == oldNode)
-        link.to = this.renameNode
+    if (this.nodeDataArray.filter(element => element.key == this.renameNode).length > 0) {
+      this.message = "Conflicting names"
+      this.openSnackBar()
     }
-    relayoutLanes()
-    setTimeout(() => {
+    else {
+      this.message = "Modified " + this.selectedNode.key + " of " + this.selectedNode.group + " to " + this.renameNode
+      this.openSnackBar()
+      console.log(this.selectedNode.key)
+      var node = this.nodeDataArray.find(element => element.key == this.selectedNode.key)
+      var oldNode = node.key
+      node.key = this.renameNode
+      node.text = this.renameNode
+      var links = this.linkDataArray.filter(element => (element.from == "oneA" || element.to == "oneA"))
+      console.log(links)
+      console.log(this.selectedNode.key.length)
+      links = this.linkDataArray.filter(element => (element.from == oldNode || element.to == oldNode))
+      console.log(links)
+      for (let link of links) {
+        if (link.from == oldNode)
+          link.from = this.renameNode
+        if (link.to == oldNode)
+          link.to = this.renameNode
+      }
       relayoutLanes()
-    })
-    relayoutDiagram()
-    this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
+      setTimeout(() => {
+        relayoutLanes()
+      })
+      relayoutDiagram()
+      this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
+    }
   }
 
   doShow() {
-    if(this.showArrays==false)
+    if (this.showArrays == false)
       this.showArrays = true
     else
       this.showArrays = false
   }
 
   openSnackBar() {
-    this._snackBar.open(this.message, "x",{duration:2000})
+    this._snackBar.open(this.message, "x", { duration: 2000 })
   }
 
-  onKeyup(event){
-    this.addButton.disabled = this.nodeDataArray.filter(element=>element.key==event.target.value).length > 0
+  onKeyup(event) {
+    this.addButton.disabled = this.nodeDataArray.filter(element => element.key == event.target.value).length > 0
     console.log(this.addButton.disabled)
   }
 
