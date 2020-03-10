@@ -25,11 +25,11 @@
     <br>
     <span *ngIf="selectedGroup!=undefined">Creating new {{selectedGroup}} </span>
     <br>
-    <span *ngIf="selectedGroup=='Pool'"><input (keyup)="onKeyupPool($event)" style="border: 1px solid black;"[(ngModel)]="poolName" placeholder="Enter Pool Name"><br></span>
+    <span *ngIf="selectedGroup=='Pool'"><input (keyup)="onKeyup($event)" style="border: 1px solid black;"[(ngModel)]="poolName" placeholder="Enter Pool Name"><br></span>
     <span *ngIf="selectedGroup=='Lane'">
         <span style="width:33%;float: left;">
           <mat-label>Enter Lane Name</mat-label>
-          <input style="width: 100%;border: 1px solid black;"[(ngModel)]="laneName" placeholder="Enter Lane Name">
+          <input style="width: 100%;border: 1px solid black;"[(ngModel)]="laneName" placeholder="Enter Lane Name" (keyup)="onKeyup($event)">
         </span>
         <span style="width:33%;float: left;">
         <mat-label>Select a pool</mat-label>
@@ -48,7 +48,7 @@
     <span *ngIf="selectedGroup=='Node'">
       <span style="width: 50%; float: left;">
         <mat-label>Enter Node Name</mat-label>
-        <input style="width: 100%;border: 1px solid black;" [(ngModel)]="nodeName" placeholder="Enter Node Name">
+        <input style="width: 100%;border: 1px solid black;" [(ngModel)]="nodeName" placeholder="Enter Node Name" (keyup)="onKeyup($event)">
       </span>
       <span style="width: 50%; float: left;">
         <mat-label>Select a Lane</mat-label>

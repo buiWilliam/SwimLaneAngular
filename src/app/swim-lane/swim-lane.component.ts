@@ -575,12 +575,9 @@ export class SwimLaneComponent implements OnInit {
     this._snackBar.open(this.message, "x",{duration:2000})
   }
 
-  onKeyupPool(event){
-    console.log(this.pools)
-    console.log(event.target.value)
-    console.log(this.addButton)
-    console.log(this.pools.filter(element=>element.key==event.target.value))
-    this.addButton.disable = this.pools.filter(element=>element.key==event.target.value).length > 0
+  onKeyup(event){
+    this.addButton.disabled = this.nodeDataArray.filter(element=>element.key==event.target.value).length > 0
+    console.log(this.addButton.disabled)
   }
 
   ngOnInit(): void {
