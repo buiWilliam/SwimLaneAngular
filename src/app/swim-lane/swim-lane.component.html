@@ -17,7 +17,7 @@
     <button #modifybutton mat-stroked-button (click)="doModify()">Modify Existing</button>
   </div>
   <div style="width:50%; float: left;">
-    <mat-radio-group [(ngModel)]=selectedGroup>
+    <mat-radio-group (change)="doRadioChange($event)" [(ngModel)]=selectedGroup>
       <mat-radio-button value="Pool">Pool</mat-radio-button>
       <mat-radio-button value="Lane">Lane</mat-radio-button>
       <mat-radio-button value="Node">Node</mat-radio-button>
@@ -61,8 +61,9 @@
     <button #addButton mat-stroked-button (click)="doAdd()">Add</button>
   </div>
   <div style="width:25%; float: left;">
-    <button mat-stroked-button *ngIf="!showArrays" (click)="doShow()">Show Arrays</button>
-    <button mat-stroked-button *ngIf="showArrays" (click)="doShow()">Hide Arrays</button>
+    <!-- <button mat-stroked-button *ngIf="!showArrays" (click)="doShow()">Show Arrays</button>
+    <button mat-stroked-button *ngIf="showArrays" (click)="doShow()">Hide Arrays</button> -->
+    <mat-slide-toggle (change)="doShow()">Show Array</mat-slide-toggle>
   </div>
 </div>
 <br>

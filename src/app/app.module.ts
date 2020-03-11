@@ -19,6 +19,7 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatSelectModule} from '@angular/material/select';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatFormFieldModule} from '@angular/material/form-field'
 
 
 @NgModule({
@@ -33,10 +34,11 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     GojsAngularModule,
     FormsModule,
-    BrowserAnimationsModule,
+    MatFormFieldModule,
     MatButtonModule,
     MatSnackBarModule,
     MatGridListModule,

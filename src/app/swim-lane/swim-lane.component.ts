@@ -168,16 +168,16 @@ export class SwimLaneComponent implements OnInit {
   pools: Array<go.ObjectData>
   showArrays = false
   selectedGroup: string
-  poolName = "Pool3"
-  laneName = "Lane7"
-  selectedPool = "Pool2"
+  poolName = ""
+  laneName = ""
+  selectedPool = ""
   selectedNode: go.ObjectData
   nodes: Array<go.ObjectData>
   lanes: Array<go.ObjectData>
-  selectedLane = "Lane3"
-  nodeName = "threeA"
-  renameNode = "1A"
-  selectedColor = "lightblue"
+  selectedLane = ""
+  nodeName = ""
+  renameNode = ""
+  selectedColor = ""
   @ViewChild('myDiagram') myDiagram
   @ViewChild('addButton') addButton
   @ViewChild('modifybutton') modifyButton
@@ -463,31 +463,31 @@ export class SwimLaneComponent implements OnInit {
 
   public nodeDataArray: Array<go.ObjectData> =
     [ // node data
-      { key: "Pool1", text: "Pool", isGroup: true, category: "Pool",figure:"Rectangle" },
-      { key: "Pool2", text: "Pool2", isGroup: true, category: "Pool",figure:"Rectangle" },
-      { key: "Lane1", text: "Lane1", isGroup: true, group: "Pool1", color: "lightblue",figure:"Rectangle" },
-      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: "lightgreen",figure:"Rectangle" },
-      { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1", color: "lightyellow",figure:"Rectangle" },
-      { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1", color: "orange",figure:"Rectangle" },
-      { key: "oneA", text: "oneA", group: "Lane1",figure:"Rectangle" },
-      { key: "oneB", text: "oneB", group: "Lane1",figure:"Rectangle" },
-      { key: "oneC", text: "oneC", group: "Lane1",figure:"Rectangle" },
-      { key: "oneD", text: "oneD", group: "Lane1",figure:"Rectangle" },
-      { key: "twoA", text: "twoA", group: "Lane2",figure:"Rectangle" },
-      { key: "twoB", text: "twoB", group: "Lane2",figure:"Rectangle" },
-      { key: "twoC", text: "twoC", group: "Lane2",figure:"Rectangle" },
-      { key: "twoD", text: "twoD", group: "Lane2",figure:"Rectangle" },
-      { key: "twoE", text: "twoE", group: "Lane2",figure:"Rectangle" },
-      { key: "twoF", text: "twoF", group: "Lane2",figure:"Rectangle" },
-      { key: "twoG", text: "twoG", group: "Lane2",figure:"Rectangle" },
-      { key: "fourA", text: "fourA", group: "Lane4",figure:"Rectangle" },
-      { key: "fourB", text: "fourB", group: "Lane4",figure:"Rectangle" },
-      { key: "fourC", text: "fourC", group: "Lane4",figure:"Rectangle" },
-      { key: "fourD", text: "fourD", group: "Lane4",figure:"Rectangle" },
-      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2", color: "lightyellow",figure:"Rectangle" },
-      { key: "Lane6", text: "Lane6", isGroup: true, group: "Pool2", color: "lightgreen",figure:"Rectangle" },
-      { key: "fiveA", text: "fiveA", group: "Lane5",figure:"Rectangle" },
-      { key: "sixA", text: "sixA", group: "Lane6",figure:"Rectangle" }
+      { key: "Pool1", text: "Pool", isGroup: true, category: "Pool" },
+      { key: "Pool2", text: "Pool2", isGroup: true, category: "Pool" },
+      { key: "Lane1", text: "Lane1", isGroup: true, group: "Pool1", color: "lightblue" },
+      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: "lightgreen"},
+      { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1", color: "lightyellow" },
+      { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1", color: "orange" },
+      { key: "oneA", text: "oneA", group: "Lane1" },
+      { key: "oneB", text: "oneB", group: "Lane1" },
+      { key: "oneC", text: "oneC", group: "Lane1" },
+      { key: "oneD", text: "oneD", group: "Lane1" },
+      { key: "twoA", text: "twoA", group: "Lane2" },
+      { key: "twoB", text: "twoB", group: "Lane2" },
+      { key: "twoC", text: "twoC", group: "Lane2" },
+      { key: "twoD", text: "twoD", group: "Lane2" },
+      { key: "twoE", text: "twoE", group: "Lane2" },
+      { key: "twoF", text: "twoF", group: "Lane2" },
+      { key: "twoG", text: "twoG", group: "Lane2" },
+      { key: "fourA", text: "fourA", group: "Lane4"},
+      { key: "fourB", text: "fourB", group: "Lane4" },
+      { key: "fourC", text: "fourC", group: "Lane4" },
+      { key: "fourD", text: "fourD", group: "Lane4"},
+      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2", color: "lightyellow"},
+      { key: "Lane6", text: "Lane6", isGroup: true, group: "Pool2", color: "lightgreen" },
+      { key: "fiveA", text: "fiveA", group: "Lane5" },
+      { key: "sixA", text: "sixA", group: "Lane6" }
     ]
   public linkDataArray: Array<go.ObjectData> =
     [ // link data
@@ -513,6 +513,7 @@ export class SwimLaneComponent implements OnInit {
   public diagramModelChange = function (changes: go.IncrementalData) {
     this.nodeDataArray = DataSyncService.syncNodeData(changes, this.nodeDataArray);
     this.linkDataArray = DataSyncService.syncLinkData(changes, this.linkDataArray);
+    this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
   };
 
   doAdd() {
@@ -523,12 +524,14 @@ export class SwimLaneComponent implements OnInit {
       this.pools = this.nodeDataArray.filter(element => element.category == 'Pool')
       this.message = "Added " + this.poolName
       this.openSnackBar()
+      this.poolName = ""
     }
     else if (this.selectedGroup == "Lane") {
       this.nodeDataArray.push({ key: this.laneName, text: this.laneName, isGroup: true, group: this.selectedPool, color: this.selectedColor })
       this.lanes = this.nodeDataArray.filter(element => element.category != 'Pool' && element.isGroup == true)
       this.message = "Added " + this.laneName + " to " + this.selectedPool
       this.openSnackBar()
+      this.laneName = ""
     }
     else if (this.selectedGroup == "Node") {
       this.nodeDataArray.push({ key: this.nodeName, text: this.nodeName, group: this.selectedLane })
@@ -539,6 +542,7 @@ export class SwimLaneComponent implements OnInit {
       setTimeout(() => {
         relayoutLanes()
       })
+      this.nodeName = ""
     }
     relayoutDiagram()
   }
@@ -604,11 +608,23 @@ export class SwimLaneComponent implements OnInit {
     }
   }
 
+  doRadioChange(event){
+    console.log(event)
+    if(event.value == "Pool"){
+      this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.poolName).length > 0
+    }
+    if(event.value == "Lane"){
+      this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.laneName).length > 0
+    }
+    if(event.value == "Node"){
+      this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.nodeName).length > 0
+    }
+  }
+
   ngOnInit(): void {
     this.pools = this.nodeDataArray.filter(element => element.category == 'Pool')
     this.lanes = this.nodeDataArray.filter(element => element.category != 'Pool' && element.isGroup == true)
     this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
-    this.selectedNode = this.nodes[0]
     console.log(this.pools)
     console.log(this.nodes)
   }
