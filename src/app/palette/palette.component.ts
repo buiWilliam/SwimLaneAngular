@@ -38,9 +38,9 @@ export class PaletteComponent implements OnInit {
       return palette;
     }
     public paletteNodeData: go.ObjectData[] = [
-      { key: "Rectangle",color:"red"},
-      {key:"Triangle",color:"green"},
-      {key:"Circle",color:"blue"}
+      {key: "Rectangle",figure:"Rectangle",color:"red"},
+      {key:"Triangle",figure:"Triangle",color:"green"},
+      {key:"Circle",figure:"Circle", color:"blue"}
     ];
     public paletteLinkData: go.ObjectData[] = [
       

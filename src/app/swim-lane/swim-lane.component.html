@@ -11,10 +11,10 @@
     <mat-select style="width: 25%; border: 1px solid black;" [(value)]="selectedNode">
       <mat-option *ngFor="let node of nodes" [value]="node">{{node.key}}</mat-option>
     </mat-select>
-    <span> to <input style="width:25%;border: 1px solid black;"[(ngModel)]="renameNode" placeholder="Change to..."></span>
+    <span> to <input style="width:25%;border: 1px solid black;"[(ngModel)]="renameNode" placeholder="Change to..." (keyup)="onKeyupModify($event)"></span>
     <br>
     <br>
-    <button mat-stroked-button (click)="doModify()">Modify Existing</button>
+    <button #modifybutton mat-stroked-button (click)="doModify()">Modify Existing</button>
   </div>
   <div style="width:50%; float: left;">
     <mat-radio-group [(ngModel)]=selectedGroup>

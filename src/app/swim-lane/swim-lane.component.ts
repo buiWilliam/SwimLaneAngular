@@ -180,6 +180,7 @@ export class SwimLaneComponent implements OnInit {
   selectedColor = "lightblue"
   @ViewChild('myDiagram') myDiagram
   @ViewChild('addButton') addButton
+  @ViewChild('modifybutton') modifyButton
   constructor(private _snackBar: MatSnackBar) {
   }
 
@@ -221,7 +222,7 @@ export class SwimLaneComponent implements OnInit {
 
     diagram.nodeTemplate = $(go.Node, "Auto",
       new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-      $(go.Shape, "Rectangle",
+      $(go.Shape, new go.Binding("figure",'figure'),
         { fill: "white", portId: "", cursor: "pointer", fromLinkable: true, toLinkable: true }),
       $(go.TextBlock, { margin: 5, editable: true, isMultiline: false },
         new go.Binding("text", "text").makeTwoWay()),
@@ -462,31 +463,31 @@ export class SwimLaneComponent implements OnInit {
 
   public nodeDataArray: Array<go.ObjectData> =
     [ // node data
-      { key: "Pool1", text: "Pool", isGroup: true, category: "Pool" },
-      { key: "Pool2", text: "Pool2", isGroup: true, category: "Pool" },
-      { key: "Lane1", text: "Lane1", isGroup: true, group: "Pool1", color: "lightblue" },
-      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: "lightgreen" },
-      { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1", color: "lightyellow" },
-      { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1", color: "orange" },
-      { key: "oneA", text: "oneA", group: "Lane1" },
-      { key: "oneB", text: "oneB", group: "Lane1" },
-      { key: "oneC", text: "oneC", group: "Lane1" },
-      { key: "oneD", text: "oneD", group: "Lane1" },
-      { key: "twoA", text: "twoA", group: "Lane2" },
-      { key: "twoB", text: "twoB", group: "Lane2" },
-      { key: "twoC", text: "twoC", group: "Lane2" },
-      { key: "twoD", text: "twoD", group: "Lane2" },
-      { key: "twoE", text: "twoE", group: "Lane2" },
-      { key: "twoF", text: "twoF", group: "Lane2" },
-      { key: "twoG", text: "twoG", group: "Lane2" },
-      { key: "fourA", text: "fourA", group: "Lane4" },
-      { key: "fourB", text: "fourB", group: "Lane4" },
-      { key: "fourC", text: "fourC", group: "Lane4" },
-      { key: "fourD", text: "fourD", group: "Lane4" },
-      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2", color: "lightyellow" },
-      { key: "Lane6", text: "Lane6", isGroup: true, group: "Pool2", color: "lightgreen" },
-      { key: "fiveA", text: "fiveA", group: "Lane5" },
-      { key: "sixA", text: "sixA", group: "Lane6" }
+      { key: "Pool1", text: "Pool", isGroup: true, category: "Pool",figure:"Rectangle" },
+      { key: "Pool2", text: "Pool2", isGroup: true, category: "Pool",figure:"Rectangle" },
+      { key: "Lane1", text: "Lane1", isGroup: true, group: "Pool1", color: "lightblue",figure:"Rectangle" },
+      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: "lightgreen",figure:"Rectangle" },
+      { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1", color: "lightyellow",figure:"Rectangle" },
+      { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1", color: "orange",figure:"Rectangle" },
+      { key: "oneA", text: "oneA", group: "Lane1",figure:"Rectangle" },
+      { key: "oneB", text: "oneB", group: "Lane1",figure:"Rectangle" },
+      { key: "oneC", text: "oneC", group: "Lane1",figure:"Rectangle" },
+      { key: "oneD", text: "oneD", group: "Lane1",figure:"Rectangle" },
+      { key: "twoA", text: "twoA", group: "Lane2",figure:"Rectangle" },
+      { key: "twoB", text: "twoB", group: "Lane2",figure:"Rectangle" },
+      { key: "twoC", text: "twoC", group: "Lane2",figure:"Rectangle" },
+      { key: "twoD", text: "twoD", group: "Lane2",figure:"Rectangle" },
+      { key: "twoE", text: "twoE", group: "Lane2",figure:"Rectangle" },
+      { key: "twoF", text: "twoF", group: "Lane2",figure:"Rectangle" },
+      { key: "twoG", text: "twoG", group: "Lane2",figure:"Rectangle" },
+      { key: "fourA", text: "fourA", group: "Lane4",figure:"Rectangle" },
+      { key: "fourB", text: "fourB", group: "Lane4",figure:"Rectangle" },
+      { key: "fourC", text: "fourC", group: "Lane4",figure:"Rectangle" },
+      { key: "fourD", text: "fourD", group: "Lane4",figure:"Rectangle" },
+      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2", color: "lightyellow",figure:"Rectangle" },
+      { key: "Lane6", text: "Lane6", isGroup: true, group: "Pool2", color: "lightgreen",figure:"Rectangle" },
+      { key: "fiveA", text: "fiveA", group: "Lane5",figure:"Rectangle" },
+      { key: "sixA", text: "sixA", group: "Lane6",figure:"Rectangle" }
     ]
   public linkDataArray: Array<go.ObjectData> =
     [ // link data
@@ -589,7 +590,18 @@ export class SwimLaneComponent implements OnInit {
 
   onKeyup(event) {
     this.addButton.disabled = this.nodeDataArray.filter(element => element.key == event.target.value).length > 0
-    console.log(this.addButton.disabled)
+    if(this.addButton.disabled){
+      this.message = "Clashing names"
+      this.openSnackBar()
+    }
+  }
+
+  onKeyupModify(event) {
+    this.modifyButton.disabled = this.nodeDataArray.filter(element => element.key == event.target.value).length > 0
+    if(this.modifyButton.disabled){
+      this.message = "Clashing names"
+      this.openSnackBar()
+    }
   }
 
   ngOnInit(): void {
