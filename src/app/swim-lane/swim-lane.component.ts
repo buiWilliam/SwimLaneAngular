@@ -2,6 +2,9 @@ import { Component, OnInit, Input, ViewEncapsulation, ViewChild, ContentChild } 
 import * as go from 'gojs';
 import { DataSyncService } from 'gojs-angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { increment, decrement, reset } from '../counter.actions';
+import { Store, select } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { element } from 'protractor';
 
 const $ = go.GraphObject.make
@@ -178,10 +181,15 @@ export class SwimLaneComponent implements OnInit {
   nodeName = ""
   renameNode = ""
   selectedColor = ""
+  count$: Observable<number>
   @ViewChild('myDiagram') myDiagram
   @ViewChild('addButton') addButton
   @ViewChild('modifybutton') modifyButton
-  constructor(private _snackBar: MatSnackBar) {
+
+  constructor(private _snackBar: MatSnackBar, private store: Store<{ count: number }>) {
+    this.count$ = store.pipe(select('count'))
+    for (let i = 0; i < this.nodeDataArray.length; i++)
+      store.dispatch(increment())
   }
 
   // initialize diagram / templates
@@ -222,11 +230,13 @@ export class SwimLaneComponent implements OnInit {
 
     diagram.nodeTemplate = $(go.Node, "Auto",
       new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-      $(go.Shape, new go.Binding("figure",'figure'),
-        { fill: "white", portId: "", cursor: "pointer", fromLinkable: true, toLinkable: true }),
+      $(go.Shape, new go.Binding("figure", 'figure'),
+        { portId: "", cursor: "pointer", fromLinkable: true, toLinkable: true,fromLinkableSelfNode: true, toLinkableSelfNode: true  },new go.Binding("fill", "isSelected", function(sel) {
+          if (sel) return "cyan"; else return "white";
+        }).ofObject("")),
       $(go.TextBlock, { margin: 5, editable: true, isMultiline: false },
         new go.Binding("text", "text").makeTwoWay()),
-      { dragComputation: stayInGroup } // limit dragging of Nodes to stay within the containing Group, defined above
+      { dragComputation: stayInGroup, selectionAdorned:false}
     );
 
     diagram.groupTemplate = $(go.Group, "Horizontal", groupStyle(),
@@ -412,7 +422,8 @@ export class SwimLaneComponent implements OnInit {
     diagram.addDiagramListener("ObjectSingleClicked",
       function (e) {
         var data = e.subject.part.data
-        if (!(data instanceof go.Link)) console.log("Clicked on " + data.key);
+        console.log("Clicked on " + data.key);
+
       });
 
     diagram.addDiagramListener("ObjectContextClicked",
@@ -426,6 +437,7 @@ export class SwimLaneComponent implements OnInit {
         e.subject.each(val => {
           if (!(val instanceof go.Link)) console.log("Dropped in " + val.key);
         })
+
       });
 
     diagram.addDiagramListener("TextEdited",
@@ -457,6 +469,8 @@ export class SwimLaneComponent implements OnInit {
         }
       });
 
+    diagram.addDiagramListener("SelectionDeleted", (e) => {
+    })
     relayoutLanes()
     return diagram;
   }
@@ -466,7 +480,7 @@ export class SwimLaneComponent implements OnInit {
       { key: "Pool1", text: "Pool", isGroup: true, category: "Pool" },
       { key: "Pool2", text: "Pool2", isGroup: true, category: "Pool" },
       { key: "Lane1", text: "Lane1", isGroup: true, group: "Pool1", color: "lightblue" },
-      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: "lightgreen"},
+      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: "lightgreen" },
       { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1", color: "lightyellow" },
       { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1", color: "orange" },
       { key: "oneA", text: "oneA", group: "Lane1" },
@@ -480,40 +494,49 @@ export class SwimLaneComponent implements OnInit {
       { key: "twoE", text: "twoE", group: "Lane2" },
       { key: "twoF", text: "twoF", group: "Lane2" },
       { key: "twoG", text: "twoG", group: "Lane2" },
-      { key: "fourA", text: "fourA", group: "Lane4"},
+      { key: "fourA", text: "fourA", group: "Lane4" },
       { key: "fourB", text: "fourB", group: "Lane4" },
       { key: "fourC", text: "fourC", group: "Lane4" },
-      { key: "fourD", text: "fourD", group: "Lane4"},
-      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2", color: "lightyellow"},
+      { key: "fourD", text: "fourD", group: "Lane4" },
+      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2", color: "lightyellow" },
       { key: "Lane6", text: "Lane6", isGroup: true, group: "Pool2", color: "lightgreen" },
       { key: "fiveA", text: "fiveA", group: "Lane5" },
       { key: "sixA", text: "sixA", group: "Lane6" }
     ]
   public linkDataArray: Array<go.ObjectData> =
     [ // link data
-      { from: "oneA", to: "oneB" },
-      { from: "oneA", to: "oneC" },
-      { from: "oneB", to: "oneD" },
-      { from: "oneC", to: "oneD" },
-      { from: "twoA", to: "twoB" },
-      { from: "twoA", to: "twoC" },
-      { from: "twoA", to: "twoF" },
-      { from: "twoB", to: "twoD" },
-      { from: "twoC", to: "twoD" },
-      { from: "twoD", to: "twoG" },
-      { from: "twoE", to: "twoG" },
-      { from: "twoF", to: "twoG" },
-      { from: "fourA", to: "fourB" },
-      { from: "fourB", to: "fourC" },
-      { from: "fourC", to: "fourD" },
+      { from: "oneA", to: "oneB" ,key:-1},
+      { from: "oneA", to: "oneC" ,key:-2},
+      { from: "oneB", to: "oneD" ,key:-3},
+      { from: "oneC", to: "oneD" ,key:-4},
+      { from: "twoA", to: "twoB" ,key:-5},
+      { from: "twoA", to: "twoC" ,key:-6},
+      { from: "twoA", to: "twoF" ,key:-7},
+      { from: "twoB", to: "twoD" ,key:-8},
+      { from: "twoC", to: "twoD" ,key:-9},
+      { from: "twoD", to: "twoG" ,key:-10},
+      { from: "twoE", to: "twoG" ,key:-11},
+      { from: "twoF", to: "twoG" ,key:-12},
+      { from: "fourA", to: "fourB" ,key:-13},
+      { from: "fourB", to: "fourC" ,key:-14},
+      { from: "fourC", to: "fourD" ,key:-15},
     ]
   public diagramDivClassName: string = 'myDiagramDiv';
 
   // When the diagram model changes, update app data to reflect those changes
   public diagramModelChange = function (changes: go.IncrementalData) {
-    this.nodeDataArray = DataSyncService.syncNodeData(changes, this.nodeDataArray);
-    this.linkDataArray = DataSyncService.syncLinkData(changes, this.linkDataArray);
-    this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
+    if (changes != null) {
+      console.log(changes)
+      this.nodeDataArray = DataSyncService.syncNodeData(changes, this.nodeDataArray);
+      this.linkDataArray = DataSyncService.syncLinkData(changes, this.linkDataArray);
+      this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
+      if (changes.removedNodeKeys != undefined)
+        for (let i = 0; i < changes.removedNodeKeys.length; i++)
+          this.store.dispatch(decrement())
+      if (changes.insertedNodeKeys != undefined)
+        for (let i = 0; i < changes.insertedNodeKeys.length; i++)
+          this.store.dispatch(increment())
+    }
   };
 
   doAdd() {
@@ -594,7 +617,7 @@ export class SwimLaneComponent implements OnInit {
 
   onKeyup(event) {
     this.addButton.disabled = this.nodeDataArray.filter(element => element.key == event.target.value).length > 0
-    if(this.addButton.disabled){
+    if (this.addButton.disabled) {
       this.message = "Clashing names"
       this.openSnackBar()
     }
@@ -602,21 +625,21 @@ export class SwimLaneComponent implements OnInit {
 
   onKeyupModify(event) {
     this.modifyButton.disabled = this.nodeDataArray.filter(element => element.key == event.target.value).length > 0
-    if(this.modifyButton.disabled){
+    if (this.modifyButton.disabled) {
       this.message = "Clashing names"
       this.openSnackBar()
     }
   }
 
-  doRadioChange(event){
+  doRadioChange(event) {
     console.log(event)
-    if(event.value == "Pool"){
+    if (event.value == "Pool") {
       this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.poolName).length > 0
     }
-    if(event.value == "Lane"){
+    if (event.value == "Lane") {
       this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.laneName).length > 0
     }
-    if(event.value == "Node"){
+    if (event.value == "Node") {
       this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.nodeName).length > 0
     }
   }

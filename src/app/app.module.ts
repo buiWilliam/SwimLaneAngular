@@ -19,7 +19,12 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatSelectModule} from '@angular/material/select';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatFormFieldModule} from '@angular/material/form-field'
+import {MatFormFieldModule} from '@angular/material/form-field';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment'
+import { counterReducer } from './counter.reducer'
 
 
 @NgModule({
@@ -45,7 +50,10 @@ import {MatFormFieldModule} from '@angular/material/form-field'
     MatButtonToggleModule,
     MatSelectModule,
     MatRadioModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    StoreModule.forRoot({count:counterReducer}, {}),
+    EffectsModule.forRoot([]),
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production })
   ],
   providers: [],
   bootstrap: [AppComponent]
