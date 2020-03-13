@@ -189,7 +189,8 @@ export class SwimLaneComponent implements OnInit {
   constructor(private _snackBar: MatSnackBar, private store: Store<{ count: number }>) {
     this.count$ = store.pipe(select('count'))
     for (let i = 0; i < this.nodeDataArray.length; i++)
-      store.dispatch(increment())
+      if(this.nodeDataArray[i].isGroup==undefined)
+        store.dispatch(increment())
   }
 
   // initialize diagram / templates
@@ -527,15 +528,20 @@ export class SwimLaneComponent implements OnInit {
   public diagramModelChange = function (changes: go.IncrementalData) {
     if (changes != null) {
       console.log(changes)
+      if (changes.removedNodeKeys != undefined)
+        for (let i = 0; i < changes.removedNodeKeys.length; i++){
+          if(this.nodeDataArray.find(element=>element.key==changes.removedNodeKeys[i]).isGroup==undefined)
+            this.store.dispatch(decrement())
+        }
+          
+      if (changes.insertedNodeKeys != undefined)
+        for (let i = 0; i < changes.insertedNodeKeys.length; i++){
+            this.store.dispatch(increment())
+        }
+
       this.nodeDataArray = DataSyncService.syncNodeData(changes, this.nodeDataArray);
       this.linkDataArray = DataSyncService.syncLinkData(changes, this.linkDataArray);
       this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
-      if (changes.removedNodeKeys != undefined)
-        for (let i = 0; i < changes.removedNodeKeys.length; i++)
-          this.store.dispatch(decrement())
-      if (changes.insertedNodeKeys != undefined)
-        for (let i = 0; i < changes.insertedNodeKeys.length; i++)
-          this.store.dispatch(increment())
     }
   };
 
@@ -566,6 +572,7 @@ export class SwimLaneComponent implements OnInit {
         relayoutLanes()
       })
       this.nodeName = ""
+      this.store.dispatch(increment())
     }
     relayoutDiagram()
   }
