@@ -25,6 +25,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment'
 import { counterReducer } from './counter.reducer'
+import { reducer } from './node.reducer'
 
 
 @NgModule({
@@ -51,7 +52,7 @@ import { counterReducer } from './counter.reducer'
     MatSelectModule,
     MatRadioModule,
     MatSlideToggleModule,
-    StoreModule.forRoot({count:counterReducer}, {}),
+    StoreModule.forRoot({count:counterReducer,nodes:reducer}),                                
     EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production })
   ],

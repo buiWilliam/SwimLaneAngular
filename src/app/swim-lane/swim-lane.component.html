@@ -69,6 +69,8 @@
 <br>
   <div *ngIf="showArrays" style="width: 100%; float: left">
     <p>Number of Nodes: {{count$|async}}</p>
+    <p>Currently Selected: {{selectedNode$|async}}</p>
+    <p>All Nodes: {{nodes$|async|json}}</p>
     <p>{{nodeDataArray|json}}</p>
     <p>{{linkDataArray|json}}</p>
   </div>

@@ -123,6 +123,7 @@
   },
   "defaultProject": "GoJS",
   "cli": {
-    "analytics": "d278f206-5396-453e-83b8-b64af85e8ef8"
+    "defaultCollection": "@ngrx/schematics",
+    "analytics": false
   }
 }

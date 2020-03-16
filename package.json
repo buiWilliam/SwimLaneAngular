@@ -23,6 +23,7 @@
     "@angular/router": "~9.0.3",
     "@ngrx/effects": "^9.0.0",
     "@ngrx/entity": "^9.0.0",
+    "@ngrx/schematics": "^9.0.0",
     "@ngrx/store": "^9.0.0",
     "@ngrx/store-devtools": "^9.0.0",
     "gojs": "^2.1.9",
