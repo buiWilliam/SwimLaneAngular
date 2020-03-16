@@ -2,7 +2,6 @@ import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 
 import { Node } from './node.model';
-import { ObjectData } from 'gojs';
 
 export const loadNodes = createAction(
   '[Node/API] Load Nodes', 
@@ -57,3 +56,6 @@ export const selectNode = createAction(
   '[Node/API] Select Node',
   props<{selectedKey:string}>()
 )
+
+export const increment = createAction('[Node/API] Increment');
+export const decrement = createAction('[Node/API] Decrement');

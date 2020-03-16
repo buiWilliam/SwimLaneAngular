@@ -7,7 +7,8 @@ export const nodesFeatureKey = 'nodes';
 
 export interface State extends EntityState<Node> {
   // additional entities state properties
-  selectedNode:string
+  selectedNode:string,
+  count:number
 }
 
 export const adapter: EntityAdapter<Node> = createEntityAdapter<Node>(
@@ -19,7 +20,8 @@ export const adapter: EntityAdapter<Node> = createEntityAdapter<Node>(
 
 export const initialState: State = adapter.getInitialState({
   // additional entity state properties
-  selectedNode: ""
+  selectedNode: null,
+  count:0
 });
 
 const nodeReducer = createReducer(
@@ -57,6 +59,12 @@ const nodeReducer = createReducer(
   on(NodeActions.selectNode, (state, { selectedKey }) => {
     return { ...state, selectedNode: selectedKey };
   }),
+  on(NodeActions.increment, (state) => {
+    return { ...state, count: state.count+1 };
+  }),
+  on(NodeActions.decrement, (state) => {
+    return { ...state, count: state.count-1 };
+  }),
 );
 
 export function reducer(state: State | undefined, action: Action) {
@@ -64,6 +72,7 @@ export function reducer(state: State | undefined, action: Action) {
 }
 
 export const getSelectedNodeKey = (state: State) => state.selectedNode;
+export const getNodeCount = (state: State) => state.count;
 
 export const {
   selectIds,

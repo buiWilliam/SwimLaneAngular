@@ -1,6 +1,6 @@
 <div style="text-align: center;">
   <gojs-diagram #myDiagram [initDiagram]='initDiagram' [nodeDataArray]='nodeDataArray' [linkDataArray]='linkDataArray'
-    [divClassName]='diagramDivClassName' (modelChange)='diagramModelChange($event)'>
+    [divClassName]='diagramDivClassName' (modelChange)='diagramModelChange($event)' (click)='onDiagramClick($event)' (keyup)='onDiagramKeyUp($event)'>
   </gojs-diagram>
   <div>
     <p>Hold Shift to move nodes into a lane</p>

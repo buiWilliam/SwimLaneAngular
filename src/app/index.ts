@@ -35,6 +35,10 @@ import {
     selectNodeState,
     fromNode.getSelectedNodeKey
   );
+  export const selectCount = createSelector(
+    selectNodeState,
+    fromNode.getNodeCount
+  );
    
   export const selectCurrentNode = createSelector(
     selectNodeEntities,

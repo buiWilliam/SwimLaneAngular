@@ -2,10 +2,9 @@ import { Component, OnInit, Input, ViewEncapsulation, ViewChild, ContentChild } 
 import * as go from 'gojs';
 import { DataSyncService } from 'gojs-angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { increment, decrement } from '../counter.actions';
 import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { loadNodes, selectNode } from '../node.actions';
+import { loadNodes, selectNode,increment,decrement } from '../node.actions';
 import { Node } from '../node.model'
 import * as fromNode from '../index';
 
@@ -196,7 +195,7 @@ export class SwimLaneComponent implements OnInit {
     // console.log(this.selectedNode$)
     this.nodes$ = store.pipe(select(fromNode.selectAllNodes))
     console.log(this.nodes$)
-    //this.count$ = this.store.pipe(select('count'))
+    this.count$ = this.store.pipe(select(fromNode.selectCount))
   }
 
   // initialize diagram / templates
@@ -469,6 +468,7 @@ export class SwimLaneComponent implements OnInit {
         }
       });
     relayoutLanes()
+
     return diagram;
   }
 
@@ -526,18 +526,19 @@ export class SwimLaneComponent implements OnInit {
       console.log(changes)
       if (changes.removedNodeKeys != undefined)
         for (let i = 0; i < changes.removedNodeKeys.length; i++){
-          //if(this.nodeDataArray.find(element=>element.key==changes.removedNodeKeys[i]).isGroup==undefined)
-            //this.store.dispatch(decrement())
+          if(this.nodeDataArray.find(element=>element.key==changes.removedNodeKeys[i]).isGroup==undefined)
+            this.store.dispatch(decrement())
         }
           
       if (changes.insertedNodeKeys != undefined)
         for (let i = 0; i < changes.insertedNodeKeys.length; i++){
-            //this.store.dispatch(increment())
+            this.store.dispatch(increment())
         }
 
       this.nodeDataArray = DataSyncService.syncNodeData(changes, this.nodeDataArray);
       this.linkDataArray = DataSyncService.syncLinkData(changes, this.linkDataArray);
       this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
+      this.store.dispatch(loadNodes({nodes:this.nodeDataArray}))
     }
   };
 
@@ -568,7 +569,7 @@ export class SwimLaneComponent implements OnInit {
         relayoutLanes()
       })
       this.nodeName = ""
-      //this.store.dispatch(increment())
+      this.store.dispatch(increment())
     }
     relayoutDiagram()
   }
@@ -648,17 +649,40 @@ export class SwimLaneComponent implements OnInit {
     }
   }
 
+  onDiagramClick(event){
+    if(this.myDiagram.diagram.selection.count == 1)
+        this.myDiagram.diagram.selection.each(node=>{
+          if (!(node instanceof go.Group))
+            this.store.dispatch(selectNode({selectedKey:node.key}))
+          else
+            this.store.dispatch(selectNode({selectedKey:""}))
+        }
+          )
+    else
+      this.store.dispatch(selectNode({selectedKey:""}))
+  }
+
+  onDiagramKeyUp(event){
+    if(this.myDiagram.diagram.selection.count == 1)
+        this.myDiagram.diagram.selection.each(node=>{
+          if (!(node instanceof go.Group))
+            this.store.dispatch(selectNode({selectedKey:node.key}))
+          else
+            this.store.dispatch(selectNode({selectedKey:""}))
+        }
+          )
+    else
+      this.store.dispatch(selectNode({selectedKey:""}))
+  }
+
   ngOnInit(): void {
     this.pools = this.nodeDataArray.filter(element => element.category == 'Pool')
     this.lanes = this.nodeDataArray.filter(element => element.category != 'Pool' && element.isGroup == true)
     this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
     console.log(this.pools)
     console.log(this.nodes)
-    this.store.dispatch(loadNodes({nodes:this.nodes}))
-    this.store.dispatch(selectNode({selectedKey:this.nodes[0].key}))
-    // for (let i = 0; i < this.nodeDataArray.length; i++)
-    //   if(this.nodeDataArray[i].isGroup==undefined){
-    //     this.store.dispatch(increment())
-    //   }
+    this.store.dispatch(loadNodes({nodes:this.nodeDataArray}))
+    for (let i = 0; i < this.nodes.length; i++)
+      this.store.dispatch(increment())
   }
 }
