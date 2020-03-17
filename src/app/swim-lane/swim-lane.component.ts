@@ -168,7 +168,6 @@ export class PoolLayout extends go.GridLayout {
 })
 export class SwimLaneComponent implements OnInit {
   message: string
-  demo = false
   pools: Array<go.ObjectData>
   showArrays = false
   selectedGroup: string
@@ -468,6 +467,7 @@ export class SwimLaneComponent implements OnInit {
         }
       });
     relayoutLanes()
+    relayoutDiagram()
 
     return diagram;
   }
@@ -476,10 +476,10 @@ export class SwimLaneComponent implements OnInit {
     [ // node data
       { key: "Pool1", text: "Pool", isGroup: true, category: "Pool" },
       { key: "Pool2", text: "Pool2", isGroup: true, category: "Pool" },
-      { key: "Lane1", text: "Lane1", isGroup: true, group: "Pool1", color: "lightblue" },
-      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: "lightgreen" },
-      { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1", color: "lightyellow" },
-      { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1", color: "orange" },
+      { key: "Lane1", text: "Lane1", isGroup: true, group: "Pool1", color: go.Brush.randomColor() },
+      { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: go.Brush.randomColor() },
+      { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1", color: go.Brush.randomColor() },
+      { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1", color: go.Brush.randomColor() },
       { key: "oneA", text: "oneA", group: "Lane1" },
       { key: "oneB", text: "oneB", group: "Lane1" },
       { key: "oneC", text: "oneC", group: "Lane1" },
@@ -495,8 +495,8 @@ export class SwimLaneComponent implements OnInit {
       { key: "fourB", text: "fourB", group: "Lane4" },
       { key: "fourC", text: "fourC", group: "Lane4" },
       { key: "fourD", text: "fourD", group: "Lane4" },
-      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2", color: "lightyellow" },
-      { key: "Lane6", text: "Lane6", isGroup: true, group: "Pool2", color: "lightgreen" },
+      { key: "Lane5", text: "Lane5", isGroup: true, group: "Pool2", color:go.Brush.randomColor() },
+      { key: "Lane6", text: "Lane6", isGroup: true, group: "Pool2", color: go.Brush.randomColor() },
       { key: "fiveA", text: "fiveA", group: "Lane5" },
       { key: "sixA", text: "sixA", group: "Lane6" }
     ]
@@ -538,12 +538,12 @@ export class SwimLaneComponent implements OnInit {
       this.nodeDataArray = DataSyncService.syncNodeData(changes, this.nodeDataArray);
       this.linkDataArray = DataSyncService.syncLinkData(changes, this.linkDataArray);
       this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
-      this.store.dispatch(loadNodes({nodes:this.nodeDataArray}))
+      let copy = [...this.nodeDataArray]
+      this.store.dispatch(loadNodes({nodes:copy}))
     }
   };
 
   doAdd() {
-    this.demo = true
     console.log(this.selectedGroup)
     if (this.selectedGroup == "Pool") {
       this.nodeDataArray.push({ key: this.poolName, text: this.poolName, isGroup: true, category: "Pool" })
@@ -575,7 +575,6 @@ export class SwimLaneComponent implements OnInit {
   }
 
   doModify() {
-    this.demo = true
     if (this.nodeDataArray.filter(element => element.key == this.renameNode).length > 0) {
       this.message = "Conflicting names"
       this.openSnackBar()
@@ -681,7 +680,8 @@ export class SwimLaneComponent implements OnInit {
     this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
     console.log(this.pools)
     console.log(this.nodes)
-    this.store.dispatch(loadNodes({nodes:this.nodeDataArray}))
+    let copy = [...this.nodeDataArray]
+    this.store.dispatch(loadNodes({nodes:copy}))
     for (let i = 0; i < this.nodes.length; i++)
       this.store.dispatch(increment())
   }
