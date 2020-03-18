@@ -52,9 +52,9 @@ export const clearNodes = createAction(
   '[Node/API] Clear Nodes'
 );
 
-export const selectNode = createAction(
+export const selectNodes = createAction(
   '[Node/API] Select Node',
-  props<{selectedKey:string}>()
+  props<{selectedKeys:Array<string>}>()
 )
 
 export const increment = createAction('[Node/API] Increment');

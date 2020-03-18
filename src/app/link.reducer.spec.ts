@@ -1,11 +1,11 @@
-import { reducerNode, initialState } from './node.reducer';
+import { reducerLink, initialState } from './link.reducer';
 
-describe('Node Reducer', () => {
+describe('Link Reducer', () => {
   describe('unknown action', () => {
     it('should return the previous state', () => {
       const action = {} as any;
 
-      const result = reducerNode(initialState, action);
+      const result = reducerLink(initialState, action);
 
       expect(result).toBe(initialState);
     });

@@ -24,7 +24,8 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment'
-import { reducer } from './node.reducer'
+import { reducerNode } from './node.reducer'
+import { reducerLink } from './Link.reducer'
 
 
 @NgModule({
@@ -51,7 +52,7 @@ import { reducer } from './node.reducer'
     MatSelectModule,
     MatRadioModule,
     MatSlideToggleModule,
-    StoreModule.forRoot({nodes:reducer}),                                
+    StoreModule.forRoot({nodes:reducerNode,links:reducerLink}),                                
     EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production })
   ],

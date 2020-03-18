@@ -4,9 +4,11 @@ import { DataSyncService } from 'gojs-angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { loadNodes, selectNode,increment,decrement } from '../node.actions';
+import { loadNodes, selectNodes,increment,decrement } from '../node.actions';
 import { Node } from '../node.model'
-import * as fromNode from '../index';
+import { Link } from '../link.model'
+import * as reducers from '../index';
+import { loadLinks } from '../link.actions';
 
 const $ = go.GraphObject.make
 
@@ -183,18 +185,19 @@ export class SwimLaneComponent implements OnInit {
   selectedColor = ""
   count$: Observable<number>
   nodes$: Observable<Node[]>
-  selectedNode$: Observable<string>
+  selectedNode$: Observable<Array<string>>
+  links$:Observable<Link[]>
   @ViewChild('myDiagram') myDiagram
   @ViewChild('addButton') addButton
   @ViewChild('modifybutton') modifyButton
 
-  constructor(private _snackBar: MatSnackBar, private store: Store<fromNode.State>) {
+  constructor(private _snackBar: MatSnackBar, private store: Store<reducers.State>) {
     //console.log(this.store.select('count'))
-    this.selectedNode$ = store.pipe(select(fromNode.selectCurrentNodeKey))
+    this.selectedNode$ = store.pipe(select(reducers.selectCurrentNodeKey))
     // console.log(this.selectedNode$)
-    this.nodes$ = store.pipe(select(fromNode.selectAllNodes))
-    console.log(this.nodes$)
-    this.count$ = this.store.pipe(select(fromNode.selectCount))
+    this.nodes$ = store.pipe(select(reducers.selectAllNodes))
+    this.links$ = store.pipe(select(reducers.selectAllLinks))
+    this.count$ = this.store.pipe(select(reducers.selectCount))
   }
 
   // initialize diagram / templates
@@ -538,8 +541,20 @@ export class SwimLaneComponent implements OnInit {
       this.nodeDataArray = DataSyncService.syncNodeData(changes, this.nodeDataArray);
       this.linkDataArray = DataSyncService.syncLinkData(changes, this.linkDataArray);
       this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
-      let copy = [...this.nodeDataArray]
-      this.store.dispatch(loadNodes({nodes:copy}))
+      var ncopy:Array<go.ObjectData> = []
+      for (let node of this.nodeDataArray){
+        var temp:go.ObjectData = {}
+        for(var k in node) temp[k]=node[k]
+        ncopy.push(temp)
+      }
+      this.store.dispatch(loadNodes({nodes:ncopy}))
+      var lcopy:Array<go.ObjectData> = []
+      for (let link of this.linkDataArray){
+        var temp:go.ObjectData = {}
+        for(var k in link) temp[k]=link[k]
+        lcopy.push(temp)
+      }
+      this.store.dispatch(loadLinks({links:lcopy}))
     }
   };
 
@@ -649,39 +664,54 @@ export class SwimLaneComponent implements OnInit {
   }
 
   onDiagramClick(event){
-    if(this.myDiagram.diagram.selection.count == 1)
-        this.myDiagram.diagram.selection.each(node=>{
-          if (!(node instanceof go.Group))
-            this.store.dispatch(selectNode({selectedKey:node.key}))
-          else
-            this.store.dispatch(selectNode({selectedKey:""}))
+    if(this.myDiagram.diagram.selection.count > 0){
+      var keys:Array<string> = []
+      this.myDiagram.diagram.selection.each(node=>{
+        if (!(node instanceof go.Group)&&!(node instanceof go.Link)){
+            keys.push(node.key)
         }
-          )
+      }
+      )
+      this.store.dispatch(selectNodes({selectedKeys:keys}))
+      }
     else
-      this.store.dispatch(selectNode({selectedKey:""}))
+      this.store.dispatch(selectNodes({selectedKeys:null}))
   }
 
   onDiagramKeyUp(event){
-    if(this.myDiagram.diagram.selection.count == 1)
-        this.myDiagram.diagram.selection.each(node=>{
-          if (!(node instanceof go.Group))
-            this.store.dispatch(selectNode({selectedKey:node.key}))
-          else
-            this.store.dispatch(selectNode({selectedKey:""}))
+    if(this.myDiagram.diagram.selection.count > 0){
+      var keys:Array<string> = []
+      this.myDiagram.diagram.selection.each(node=>{
+        if (!(node instanceof go.Group)&&!(node instanceof go.Link)){
+            keys.push(node.key)
         }
-          )
+      }
+      )
+      this.store.dispatch(selectNodes({selectedKeys:keys}))
+      }
     else
-      this.store.dispatch(selectNode({selectedKey:""}))
+      this.store.dispatch(selectNodes({selectedKeys:null}))
   }
 
   ngOnInit(): void {
     this.pools = this.nodeDataArray.filter(element => element.category == 'Pool')
     this.lanes = this.nodeDataArray.filter(element => element.category != 'Pool' && element.isGroup == true)
     this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
-    console.log(this.pools)
-    console.log(this.nodes)
-    let copy = [...this.nodeDataArray]
-    this.store.dispatch(loadNodes({nodes:copy}))
+    var ncopy:Array<go.ObjectData> = []
+    for (let node of this.nodeDataArray){
+      var temp:go.ObjectData = {}
+      for(var k in node) temp[k]=node[k]
+      ncopy.push(temp)
+    }
+    this.store.dispatch(loadNodes({nodes:ncopy}))
+    var lcopy:Array<go.ObjectData> = []
+      for (let link of this.linkDataArray){
+        var temp:go.ObjectData = {}
+        for(var k in link) temp[k]=link[k]
+        lcopy.push(temp)
+      }
+      console.log(lcopy)
+      this.store.dispatch(loadLinks({links:lcopy}))
     for (let i = 0; i < this.nodes.length; i++)
       this.store.dispatch(increment())
   }
