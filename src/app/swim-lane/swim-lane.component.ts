@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewEncapsulation, ViewChild, ContentChild } from '@angular/core';
+import { Component, OnInit, Input, ViewEncapsulation, ViewChild, ContentChild, ComponentFactoryResolver } from '@angular/core';
 import * as go from 'gojs';
 import { DataSyncService } from 'gojs-angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -640,26 +640,37 @@ export class SwimLaneComponent implements OnInit {
   doLoadNodes(){
     this.nodeData.retrieveAllNodes().subscribe(
       response=>{
-        for(var name in response )
-        {
-          if (response.hasOwnProperty(name))
-          {
-            console.log(name + ': ' + response[name]);
-            this.nodeDataArray.push(response[name])
-          }
+        console.log(response)
+        let nodes=Object.values(response)
+        for (var i=0;i<nodes.length;i++){
+          console.log(nodes[i])
+          this.nodeDataArray.push(nodes[i])
         }
+        var ncopy:Array<go.ObjectData> = []
+        for (let node of this.nodeDataArray){
+          var temp:go.ObjectData = {}
+          for(var k in node) temp[k]=node[k]
+          ncopy.push(temp)
+        }
+        this.store.dispatch(loadNodes({nodes:ncopy}))
       }
     )
     this.message = "Nodes loaded"
     this.openSnackBar()
+    relayoutLanes()
+    setTimeout(() => {
+      relayoutLanes()
+    })
   }
   doPostAllNode(){
-    for (let node in this.nodeDataArray)
-      this.nodeData.postNode(node).subscribe(response=>console.log(response))
+    for (let node in this.nodeDataArray){
+      console.log(node)
+      this.nodeData.postNode(this.nodeDataArray[node]).subscribe(response=>console.log(response))
+    }
     this.message = "Nodes saved"
   }
   doRetrieveByKey(){
-    this.nodeData.retrieveNodeByKey(this.nodeName).subscribe(response => console.log(response.stringify))
+    this.nodeData.retrieveNodeByKey(this.nodeName).subscribe(response => console.log(response))
   }
   openSnackBar() {
     this._snackBar.open(this.message, "x", { duration: 2000 })

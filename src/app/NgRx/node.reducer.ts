@@ -1,6 +1,6 @@
 import { Action, createReducer, on, createSelector } from '@ngrx/store';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { Node } from './node.model';
+import { ObjectData as Node } from 'gojs';
 import * as NodeActions from './node.actions';
 
 export const nodesFeatureKey = 'nodes';
