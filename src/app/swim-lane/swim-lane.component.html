@@ -66,6 +66,21 @@
     <mat-slide-toggle (change)="doShow()">Show Array</mat-slide-toggle>
   </div>
 </div>
+<div style="width: 75%; margin:auto">
+    <div style="width:25%; float: left;">
+      <button mat-stroked-button (click)="doClearLocal()">Clear Diagram</button>
+    </div>
+    <div style="width:25%; float: left;">
+      <button mat-stroked-button (click)="doLoadNodes()">Load from Database</button>
+    </div>
+    <div style="width:25%; float: left;">
+      <button mat-stroked-button (click)="doPostAllNode()">Save to Database</button>
+    </div>
+    <div style="width:25%; float: left;">
+      <input style="width: 100%;border: 1px solid black;" [(ngModel)]="nodeName" placeholder="Enter Node Key" (keyup)="onKeyup($event)">
+      <button mat-stroked-button (click)="doRetrieveByKey()">Find by key</button>
+    </div>
+</div>
 <br>
   <div *ngIf="showArrays" style="width: 100%; float: left">
     <p>Number of Nodes: {{count$|async}}</p>

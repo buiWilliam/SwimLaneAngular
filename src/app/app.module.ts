@@ -24,8 +24,9 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment'
-import { reducerNode } from './node.reducer'
-import { reducerLink } from './Link.reducer'
+import { reducerNode } from './NgRx/node.reducer'
+import { reducerLink } from './NgRx/link.reducer'
+import { HttpClientModule } from '@angular/common/http'
 
 
 @NgModule({
@@ -54,7 +55,8 @@ import { reducerLink } from './Link.reducer'
     MatSlideToggleModule,
     StoreModule.forRoot({nodes:reducerNode,links:reducerLink}),                                
     EffectsModule.forRoot([]),
-    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production })
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

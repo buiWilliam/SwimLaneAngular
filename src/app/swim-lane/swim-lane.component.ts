@@ -4,11 +4,12 @@ import { DataSyncService } from 'gojs-angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { loadNodes, selectNodes,increment,decrement } from '../node.actions';
-import { Node } from '../node.model'
-import { Link } from '../link.model'
-import * as reducers from '../index';
-import { loadLinks } from '../link.actions';
+import { loadNodes, selectNodes,increment,decrement } from '../NgRx/node.actions';
+import { Node } from '../NgRx/node.model'
+import { Link } from '../NgRx/link.model'
+import * as reducers from '../NgRx/index';
+import { loadLinks } from '../NgRx/link.actions';
+import { NodeDataService } from '../service/node-data.service';
 
 const $ = go.GraphObject.make
 
@@ -16,6 +17,10 @@ var diagram: go.Diagram
 
 var MINLENGTH = 200;  // this controls the minimum length of any swimlane
 var MINBREADTH = 20;  // this controls the minimum breadth of any non-collapsed swimlane
+
+const url = "http://54.224.222.23:7001/"
+//gojs/nodes Get/Post Nodes
+//gojs/nodes/[key] Get node
 
 function relayoutLanes() {
   diagram.nodes.each(function (lane) {
@@ -191,7 +196,7 @@ export class SwimLaneComponent implements OnInit {
   @ViewChild('addButton') addButton
   @ViewChild('modifybutton') modifyButton
 
-  constructor(private _snackBar: MatSnackBar, private store: Store<reducers.State>) {
+  constructor(private _snackBar: MatSnackBar, private store: Store<reducers.State>,private nodeData:NodeDataService) {
     //console.log(this.store.select('count'))
     this.selectedNode$ = store.pipe(select(reducers.selectCurrentNodeKey))
     // console.log(this.selectedNode$)
@@ -243,7 +248,7 @@ export class SwimLaneComponent implements OnInit {
           if (sel) return "cyan"; else return "white";
         }).ofObject("")),
       $(go.TextBlock, { margin: 5, editable: true, isMultiline: false },
-        new go.Binding("text", "text").makeTwoWay()),
+        new go.Binding("text", "key")),
       { dragComputation: stayInGroup, selectionAdorned:false}
     );
 
@@ -628,7 +633,34 @@ export class SwimLaneComponent implements OnInit {
     else
       this.showArrays = false
   }
-
+  doClearLocal(){
+    this.nodeDataArray=[]
+    this.linkDataArray=[]
+  }
+  doLoadNodes(){
+    this.nodeData.retrieveAllNodes().subscribe(
+      response=>{
+        for(var name in response )
+        {
+          if (response.hasOwnProperty(name))
+          {
+            console.log(name + ': ' + response[name]);
+            this.nodeDataArray.push(response[name])
+          }
+        }
+      }
+    )
+    this.message = "Nodes loaded"
+    this.openSnackBar()
+  }
+  doPostAllNode(){
+    for (let node in this.nodeDataArray)
+      this.nodeData.postNode(node).subscribe(response=>console.log(response))
+    this.message = "Nodes saved"
+  }
+  doRetrieveByKey(){
+    this.nodeData.retrieveNodeByKey(this.nodeName).subscribe(response => console.log(response.stringify))
+  }
   openSnackBar() {
     this._snackBar.open(this.message, "x", { duration: 2000 })
     console.log(this.myDiagram)
@@ -653,13 +685,13 @@ export class SwimLaneComponent implements OnInit {
   doRadioChange(event) {
     console.log(event)
     if (event.value == "Pool") {
-      this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.poolName).length > 0
+      this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.poolName).length > 0 || this.poolName == ""
     }
     if (event.value == "Lane") {
-      this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.laneName).length > 0
+      this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.laneName).length > 0 || this.laneName == ""
     }
     if (event.value == "Node") {
-      this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.nodeName).length > 0
+      this.addButton.disabled = this.nodeDataArray.filter(element => element.key == this.nodeName).length > 0 || this.nodeName == ""
     }
   }
 
