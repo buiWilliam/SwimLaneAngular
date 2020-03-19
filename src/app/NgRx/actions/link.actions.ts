@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 
-import { Link } from './link.model';
+import { Link } from '../link.model';
 
 export const loadLinks = createAction(
   '[Link/API] Load Links', 

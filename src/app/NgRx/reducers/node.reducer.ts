@@ -1,7 +1,7 @@
-import { Action, createReducer, on, createSelector } from '@ngrx/store';
+import { Action, createReducer, on } from '@ngrx/store';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { ObjectData as Node } from 'gojs';
-import * as NodeActions from './node.actions';
+import * as NodeActions from '../actions/node.actions';
 
 export const nodesFeatureKey = 'nodes';
 
@@ -50,7 +50,9 @@ const nodeReducer = createReducer(
   on(NodeActions.deleteNodes,
     (state, action) => adapter.removeMany(action.ids, state)
   ),
-  on(NodeActions.loadNodes,
+  on(NodeActions.loadNodes
+  ),
+  on(NodeActions.loadNodesSuccess,
     (state, action) => adapter.setAll(action.nodes, state)
   ),
   on(NodeActions.clearNodes,

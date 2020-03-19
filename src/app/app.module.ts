@@ -24,10 +24,10 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment'
-import { reducerNode } from './NgRx/node.reducer'
-import { reducerLink } from './NgRx/link.reducer'
+import { reducerNode } from './NgRx/reducers/node.reducer'
+import { reducerLink } from './NgRx/reducers/link.reducer'
 import { HttpClientModule } from '@angular/common/http'
-
+import {NodesEffects} from './NgRx/effects/nodes.effect'
 
 @NgModule({
   declarations: [
@@ -54,7 +54,7 @@ import { HttpClientModule } from '@angular/common/http'
     MatRadioModule,
     MatSlideToggleModule,
     StoreModule.forRoot({nodes:reducerNode,links:reducerLink}),                                
-    EffectsModule.forRoot([]),
+    EffectsModule.forRoot([NodesEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
     HttpClientModule,
   ],

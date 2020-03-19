@@ -1,7 +1,7 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { Link } from './link.model';
-import * as LinkActions from './link.actions';
+import { Link } from '../link.model';
+import * as LinkActions from '../actions/link.actions';
 
 export const linksFeatureKey = 'links';
 

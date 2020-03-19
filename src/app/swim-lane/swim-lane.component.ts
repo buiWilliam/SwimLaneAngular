@@ -4,11 +4,10 @@ import { DataSyncService } from 'gojs-angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { loadNodes, selectNodes,increment,decrement } from '../NgRx/node.actions';
-import { Node } from '../NgRx/node.model'
+import { loadNodes, selectNodes,increment,decrement, clearNodes } from '../NgRx/actions/node.actions';
 import { Link } from '../NgRx/link.model'
 import * as reducers from '../NgRx/index';
-import { loadLinks } from '../NgRx/link.actions';
+import { loadLinks } from '../NgRx/actions/link.actions';
 import { NodeDataService } from '../service/node-data.service';
 
 const $ = go.GraphObject.make
@@ -189,7 +188,7 @@ export class SwimLaneComponent implements OnInit {
   renameNode = ""
   selectedColor = ""
   count$: Observable<number>
-  nodes$: Observable<Node[]>
+  nodes$: Observable<go.ObjectData[]>
   selectedNode$: Observable<Array<string>>
   links$:Observable<Link[]>
   @ViewChild('myDiagram') myDiagram
@@ -470,7 +469,7 @@ export class SwimLaneComponent implements OnInit {
           relayoutLanes()
           setTimeout(() => {
             relayoutLanes()
-          })
+          },20)
           relayoutDiagram()
         }
       });
@@ -552,7 +551,7 @@ export class SwimLaneComponent implements OnInit {
         for(var k in node) temp[k]=node[k]
         ncopy.push(temp)
       }
-      this.store.dispatch(loadNodes({nodes:ncopy}))
+      
       var lcopy:Array<go.ObjectData> = []
       for (let link of this.linkDataArray){
         var temp:go.ObjectData = {}
@@ -587,7 +586,7 @@ export class SwimLaneComponent implements OnInit {
       relayoutLanes()
       setTimeout(() => {
         relayoutLanes()
-      })
+      },20)
       this.nodeName = ""
       this.store.dispatch(increment())
     }
@@ -621,7 +620,7 @@ export class SwimLaneComponent implements OnInit {
       relayoutLanes()
       setTimeout(() => {
         relayoutLanes()
-      })
+      },20)
       relayoutDiagram()
       this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
     }
@@ -636,31 +635,21 @@ export class SwimLaneComponent implements OnInit {
   doClearLocal(){
     this.nodeDataArray=[]
     this.linkDataArray=[]
+    this.store.dispatch(clearNodes())
   }
   doLoadNodes(){
-    this.nodeData.retrieveAllNodes().subscribe(
-      response=>{
-        console.log(response)
-        let nodes=Object.values(response)
-        for (var i=0;i<nodes.length;i++){
-          console.log(nodes[i])
-          this.nodeDataArray.push(nodes[i])
-        }
-        var ncopy:Array<go.ObjectData> = []
-        for (let node of this.nodeDataArray){
-          var temp:go.ObjectData = {}
-          for(var k in node) temp[k]=node[k]
-          ncopy.push(temp)
-        }
-        this.store.dispatch(loadNodes({nodes:ncopy}))
-      }
-    )
+    
+    this.store.dispatch(loadNodes())
+    this.nodes$.subscribe(response=>{
+      for (let node of response)
+        this.nodeDataArray.push(node)
+    })
     this.message = "Nodes loaded"
     this.openSnackBar()
     relayoutLanes()
     setTimeout(() => {
       relayoutLanes()
-    })
+    },20)
   }
   doPostAllNode(){
     for (let node in this.nodeDataArray){
@@ -668,6 +657,7 @@ export class SwimLaneComponent implements OnInit {
       this.nodeData.postNode(this.nodeDataArray[node]).subscribe(response=>console.log(response))
     }
     this.message = "Nodes saved"
+    this.openSnackBar()
   }
   doRetrieveByKey(){
     this.nodeData.retrieveNodeByKey(this.nodeName).subscribe(response => console.log(response))
@@ -746,7 +736,6 @@ export class SwimLaneComponent implements OnInit {
       for(var k in node) temp[k]=node[k]
       ncopy.push(temp)
     }
-    this.store.dispatch(loadNodes({nodes:ncopy}))
     var lcopy:Array<go.ObjectData> = []
       for (let link of this.linkDataArray){
         var temp:go.ObjectData = {}

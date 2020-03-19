@@ -3,8 +3,8 @@ import {
     createFeatureSelector,
     ActionReducerMap,
   } from '@ngrx/store';
-  import * as fromNode from './node.reducer';
-  import * as fromLink from './link.reducer'
+  import * as fromNode from './reducers/node.reducer';
+  import * as fromLink from './reducers/link.reducer'
    
   export interface State {
     nodes: fromNode.State;

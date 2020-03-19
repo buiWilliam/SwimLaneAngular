@@ -1,11 +1,17 @@
 import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 
-import { Node } from './node.model';
+import { ObjectData as Node } from 'gojs';
 
 export const loadNodes = createAction(
-  '[Node/API] Load Nodes', 
+  '[Node/API] Load Nodes'
+);
+export const loadNodesSuccess = createAction(
+  '[Node/API] Nodes Loaded Success', 
   props<{ nodes: Node[] }>()
+);
+export const loadNodeFail = createAction(
+  '[Node/API] Nodes Loaded Failure'
 );
 
 export const addNode = createAction(
