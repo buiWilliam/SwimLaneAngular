@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { EMPTY } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
 import { map, mergeMap, catchError, exhaustMap, tap } from 'rxjs/operators';
 import { NodeDataService } from "../../service/node-data.service"
 import  * as fromNode from '../actions/node.actions'
@@ -15,7 +15,18 @@ export class NodesEffects{
       mergeMap(() => this.nodeData.retrieveAllNodes()
         .pipe(
           map(nodes => fromNode.loadNodesSuccess({nodes:Object.values(nodes)}),
-          catchError(() => fromNode.loadNodeFail))
+          catchError(() => of(fromNode.loadNodeFail)))
+        )
+      )
+    )
+  );
+  saveNodes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(fromNode.saveNode),
+      mergeMap((action) => this.nodeData.postNode(action.node)
+        .pipe(
+          map(() => fromNode.saveNodeSuccess(),
+          catchError(() => of(fromNode.saveNodeFail())))
         )
       )
     )

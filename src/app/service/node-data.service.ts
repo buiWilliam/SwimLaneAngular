@@ -15,7 +15,7 @@ export class NodeDataService {
   }
 
   postNode(node){
-    return this.http.post(this.url,node,{responseType:'text'})
+    return this.http.post(this.url,node)
   }
 
   retrieveNodeByKey(key){

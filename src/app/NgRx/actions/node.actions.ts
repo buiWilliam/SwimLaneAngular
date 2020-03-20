@@ -7,13 +7,26 @@ export const loadNodes = createAction(
   '[Node/API] Load Nodes'
 );
 export const loadNodesSuccess = createAction(
-  '[Node/API] Nodes Loaded Success', 
+  '[Node/API] Nodes Load Success', 
+  props<{ nodes: Node[] }>()
+);
+export const updateNodeState = createAction(
+  '[Node/API] State Updated', 
   props<{ nodes: Node[] }>()
 );
 export const loadNodeFail = createAction(
-  '[Node/API] Nodes Loaded Failure'
+  '[Node/API] Nodes Load Failure'
 );
-
+export const saveNode = createAction(
+  '[Node/API] Save Nodes', 
+  props<{ node: Node}>()
+);
+export const saveNodeSuccess = createAction(
+  '[Node/API] Nodes Save Success', 
+);
+export const saveNodeFail = createAction(
+  '[Node/API] Nodes Save Failure'
+);
 export const addNode = createAction(
   '[Node/API] Add Node',
   props<{ node: Node }>()

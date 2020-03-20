@@ -67,7 +67,9 @@ const nodeReducer = createReducer(
   on(NodeActions.decrement, (state) => {
     return { ...state, count: state.count-1 };
   }),
-  
+  on(NodeActions.updateNodeState,
+    (state, action) => adapter.setAll(action.nodes, state)
+  ),
 );
 
 export function reducerNode(state: State | undefined, action: Action) {
