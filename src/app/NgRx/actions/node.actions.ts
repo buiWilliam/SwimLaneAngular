@@ -79,3 +79,7 @@ export const selectNodes = createAction(
 export const increment = createAction('[Node/API] Increment');
 export const decrement = createAction('[Node/API] Decrement');
 
+export const setCount = createAction(
+  '[Node/API] SetCount',
+  props<{count:number}>()
+)

@@ -4,7 +4,7 @@ import { DataSyncService } from 'gojs-angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { loadNodes, selectNodes,increment,decrement, clearNodes, saveNode, updateNodeState } from '../NgRx/actions/node.actions';
+import { loadNodes, selectNodes,increment,decrement, clearNodes, saveNode, updateNodeState, setCount } from '../NgRx/actions/node.actions';
 import * as reducers from '../NgRx/index';
 import { loadLinks,updateLinkState } from '../NgRx/actions/link.actions';
 import { DiagramDataService } from '../service/diagram-data.service';
@@ -642,14 +642,22 @@ export class SwimLaneComponent implements OnInit {
   doClearLocal(){
     this.nodeDataArray=[]
     this.linkDataArray=[]
+    this.nodes=[]
+    this.pools=[]
+    this.lanes=[]
     this.store.dispatch(clearNodes())
+    this.store.dispatch(setCount({count:0}))
+    console.log(this.nodeDataArray)
   }
   doLoadNodes(){
     this.doClearLocal()
     this.store.dispatch(loadNodes())
     this.nodes$.subscribe(response=>{
-      for (let node of response)
+      for (let node of response){
+        if(this.nodeDataArray.filter(element=>element.key==node.key).length==0)
         this.nodeDataArray.push(node)
+      }
+      this.store.dispatch(setCount({count:this.nodes.length}))
     })
     this.message = "Nodes loaded"
     this.openSnackBar()
@@ -657,6 +665,7 @@ export class SwimLaneComponent implements OnInit {
     setTimeout(() => {
       relayoutLanes()
     },200)
+    
   }
   doPostAllNode(){
     console.log("Posting Nodes")

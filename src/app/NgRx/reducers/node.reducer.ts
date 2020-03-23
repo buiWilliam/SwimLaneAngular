@@ -67,6 +67,9 @@ const nodeReducer = createReducer(
   on(NodeActions.decrement, (state) => {
     return { ...state, count: state.count-1 };
   }),
+  on(NodeActions.setCount, (state,action) => {
+    return { ...state, count: action.count };
+  }),
   on(NodeActions.updateNodeState,
     (state, action) => adapter.setAll(action.nodes, state)
   ),
