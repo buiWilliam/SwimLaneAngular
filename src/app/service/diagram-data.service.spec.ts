@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { NodeDataService } from './node-data.service';
+import { DiagramDataService } from './diagram-data.service';
 
-describe('NodeDataService', () => {
-  let service: NodeDataService;
+describe('DiagramDataService', () => {
+  let service: DiagramDataService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(NodeDataService);
+    service = TestBed.inject(DiagramDataService);
   });
 
   it('should be created', () => {

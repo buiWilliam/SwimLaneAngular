@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { EMPTY, of } from 'rxjs';
+import { of } from 'rxjs';
 import { map, mergeMap, catchError, exhaustMap, tap } from 'rxjs/operators';
-import { NodeDataService } from "../../service/node-data.service"
+import { DiagramDataService } from "../../service/diagram-data.service"
 import  * as fromNode from '../actions/node.actions'
 
 @Injectable()
 export class NodesEffects{
-    constructor(private actions$: Actions,private nodeData:NodeDataService){}
+    constructor(private actions$: Actions,private nodeData:DiagramDataService){}
 
     loadNodes$ = createEffect(() =>
     this.actions$.pipe(

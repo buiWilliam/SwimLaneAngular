@@ -5,10 +5,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { loadNodes, selectNodes,increment,decrement, clearNodes, saveNode, updateNodeState } from '../NgRx/actions/node.actions';
-import { Link } from '../NgRx/link.model'
 import * as reducers from '../NgRx/index';
-import { loadLinks } from '../NgRx/actions/link.actions';
-import { NodeDataService } from '../service/node-data.service';
+import { loadLinks,updateLinkState } from '../NgRx/actions/link.actions';
+import { DiagramDataService } from '../service/diagram-data.service';
 
 const $ = go.GraphObject.make
 
@@ -17,7 +16,6 @@ var diagram: go.Diagram
 var MINLENGTH = 200;  // this controls the minimum length of any swimlane
 var MINBREADTH = 20;  // this controls the minimum breadth of any non-collapsed swimlane
 
-const url = "http://54.224.222.23:7001/"
 //gojs/nodes Get/Post Nodes
 //gojs/nodes/[key] Get node
 
@@ -190,12 +188,12 @@ export class SwimLaneComponent implements OnInit {
   count$: Observable<number>
   nodes$: Observable<go.ObjectData[]>
   selectedNode$: Observable<Array<string>>
-  links$:Observable<Link[]>
+  links$:Observable<go.ObjectData[]>
   @ViewChild('myDiagram') myDiagram
   @ViewChild('addButton') addButton
   @ViewChild('modifybutton') modifyButton
 
-  constructor(private _snackBar: MatSnackBar, private store: Store<reducers.State>,private nodeData:NodeDataService) {
+  constructor(private _snackBar: MatSnackBar, private store: Store<reducers.State>,private nodeData:DiagramDataService) {
     //console.log(this.store.select('count'))
     this.selectedNode$ = store.pipe(select(reducers.selectCurrentNodeKey))
     // console.log(this.selectedNode$)
@@ -487,7 +485,7 @@ export class SwimLaneComponent implements OnInit {
       { key: "Lane2", text: "Lane2", isGroup: true, group: "Pool1", color: go.Brush.randomColor() },
       { key: "Lane3", text: "Lane3", isGroup: true, group: "Pool1", color: go.Brush.randomColor() },
       { key: "Lane4", text: "Lane4", isGroup: true, group: "Pool1", color: go.Brush.randomColor() },
-      { key: "oneA", text: "oneA", group: "Lane1" },
+      { key: "oneA", group: "Lane1"},
       { key: "oneB", text: "oneB", group: "Lane1" },
       { key: "oneC", text: "oneC", group: "Lane1" },
       { key: "oneD", text: "oneD", group: "Lane1" },
@@ -544,14 +542,23 @@ export class SwimLaneComponent implements OnInit {
 
       this.nodeDataArray = DataSyncService.syncNodeData(changes, this.nodeDataArray);
       this.linkDataArray = DataSyncService.syncLinkData(changes, this.linkDataArray);
+      this.pools = this.nodeDataArray.filter(element => element.category == 'Pool')
+      this.lanes = this.nodeDataArray.filter(element => element.category != 'Pool' && element.isGroup == true)
       this.nodes = this.nodeDataArray.filter(element => element.isGroup == undefined)
+      var ncopy:Array<go.ObjectData> = []
+      for (let node of this.nodeDataArray){
+        var temp:go.ObjectData = {}
+        for(var k in node) temp[k]=node[k]
+        ncopy.push(temp)
+      }
+      this.store.dispatch(updateNodeState({nodes:ncopy}))
       var lcopy:Array<go.ObjectData> = []
       for (let link of this.linkDataArray){
         var temp:go.ObjectData = {}
         for(var k in link) temp[k]=link[k]
         lcopy.push(temp)
       }
-      this.store.dispatch(loadLinks({links:lcopy}))
+      this.store.dispatch(updateLinkState({links:lcopy}))
     }
   };
 
@@ -649,7 +656,7 @@ export class SwimLaneComponent implements OnInit {
     relayoutLanes()
     setTimeout(() => {
       relayoutLanes()
-    },20)
+    },200)
   }
   doPostAllNode(){
     console.log("Posting Nodes")
@@ -748,7 +755,7 @@ export class SwimLaneComponent implements OnInit {
       }
       this.store.dispatch(updateNodeState({nodes:ncopy}))
       console.log(lcopy)
-      this.store.dispatch(loadLinks({links:lcopy}))
+      this.store.dispatch(updateLinkState({links:lcopy}))
     for (let i = 0; i < this.nodes.length; i++)
       this.store.dispatch(increment())
   }

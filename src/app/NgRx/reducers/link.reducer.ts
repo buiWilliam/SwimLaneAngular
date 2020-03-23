@@ -45,7 +45,7 @@ const linkReducer = createReducer(
   on(LinkActions.deleteLinks,
     (state, action) => adapter.removeMany(action.ids, state)
   ),
-  on(LinkActions.loadLinks,
+  on(LinkActions.updateLinkState,
     (state, action) => adapter.setAll(action.links, state)
   ),
   on(LinkActions.clearLinks,
@@ -54,6 +54,11 @@ const linkReducer = createReducer(
   on(LinkActions.selectLink, (state, { selectedKey }) => {
     return { ...state, selectedLinkKey: selectedKey };
   }),
+  on(LinkActions.loadLinks
+  ),
+  on(LinkActions.loadLinksSuccess,
+    (state, action) => adapter.setAll(action.links, state)
+  ),
 );
 
 export function reducerLink(state: State | undefined, action: Action) {

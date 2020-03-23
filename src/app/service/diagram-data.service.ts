@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
-export class NodeDataService {
+export class DiagramDataService {
   url = "http://54.224.222.23:7001/gojs/nodes"
   //gojs/nodes Get/Post Nodes
   //gojs/nodes/[key] Get node

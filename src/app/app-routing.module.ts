@@ -6,7 +6,7 @@ import { SwimLaneComponent } from './swim-lane/swim-lane.component';
 
 const routes: Routes = [
   {path:"",component:LandingPageComponent},
-  {path:"swimLane",component:SwimLaneComponent}
+  {path:"swimLane",component:SwimLaneComponent},
 ];
 
 @NgModule({

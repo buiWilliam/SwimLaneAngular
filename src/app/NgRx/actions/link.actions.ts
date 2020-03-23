@@ -1,10 +1,20 @@
 import { createAction, props } from '@ngrx/store';
 import { Update } from '@ngrx/entity';
 
-import { Link } from '../link.model';
+import { ObjectData as Link } from 'gojs';
 
 export const loadLinks = createAction(
+  '[Link/API] Load Links'
+);
+export const loadLinksSuccess = createAction(
   '[Link/API] Load Links', 
+  props<{ links: Link[] }>()
+);
+export const loadLinksFail = createAction(
+  '[Link/API] Load Links'
+);
+export const updateLinkState = createAction(
+  '[Link/API] Update Links State', 
   props<{ links: Link[] }>()
 );
 
